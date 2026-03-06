@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { 
   ArrowLeft, 
   Sparkles, 
@@ -9,9 +9,7 @@ import {
   Trash2, 
   Save, 
   Code,
-  Terminal,
   Database,
-  Search,
   MessageSquare
 } from "lucide-react";
 import Link from "next/link";
@@ -32,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { RULESETS, TABLE_SCHEMA } from "@/lib/mock-data";
 import { generateWhereClause } from "@/ai/flows/ai-where-clause-generation";
 import { toast } from "@/hooks/use-toast";
@@ -45,9 +44,16 @@ type Condition = {
 };
 
 export default function WhereClauseBuilderPage() {
-  const { id } = useParams();
+  const params = useParams();
   const router = useRouter();
-  const ruleset = RULESETS.find(r => r.id === id) || RULESETS[0];
+  
+  // Robustly extract ID
+  const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : null;
+
+  const ruleset = useMemo(() => {
+    if (!id) return RULESETS[0];
+    return RULESETS.find(r => r.id === id) || RULESETS[0];
+  }, [id]);
 
   const [conditions, setConditions] = useState<Condition[]>([
     { id: "1", column: "created_at", operator: "<", value: "2023-01-01", join: "AND" }
@@ -86,11 +92,13 @@ export default function WhereClauseBuilderPage() {
         tableSchema: TABLE_SCHEMA,
         databaseType: "PostgreSQL"
       });
-      setGeneratedSql(`WHERE ${result.whereClause}`);
-      toast({
-        title: "AI Suggestion Ready",
-        description: result.explanation,
-      });
+      if (result?.whereClause) {
+        setGeneratedSql(`WHERE ${result.whereClause}`);
+        toast({
+          title: "AI Suggestion Ready",
+          description: result.explanation,
+        });
+      }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -109,6 +117,8 @@ export default function WhereClauseBuilderPage() {
     });
     router.push("/rulesets");
   };
+
+  if (!ruleset) return <div className="p-8 text-center">Loading ruleset...</div>;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
@@ -225,7 +235,7 @@ export default function WhereClauseBuilderPage() {
             </CardHeader>
             <CardContent>
               <div className="bg-black/90 text-green-400 p-4 rounded-lg font-mono text-sm border-l-4 border-primary">
-                <span className="text-blue-400">SELECT</span> * <span className="text-blue-400">FROM</span> {ruleset.tables[0]}<br />
+                <span className="text-blue-400">SELECT</span> * <span className="text-blue-400">FROM</span> {ruleset.tables?.[0] || 'table_name'}<br />
                 {generatedSql}
               </div>
             </CardContent>
