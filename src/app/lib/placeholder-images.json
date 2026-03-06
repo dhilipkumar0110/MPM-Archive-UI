@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-dashboard",
+      "description": "A professional data dashboard overview",
+      "imageUrl": "https://picsum.photos/seed/archiva1/1200/600",
+      "imageHint": "data dashboard"
+    },
+    {
+      "id": "ruleset-icon",
+      "description": "Icon for a data ruleset",
+      "imageUrl": "https://picsum.photos/seed/archiva2/400/300",
+      "imageHint": "database rules"
+    }
+  ]
+}
