@@ -1,50 +1,96 @@
 
 export const METADATA_SUMMARY = [
-  { id: 1, label: "Total Tasks", value: "142", subValue: "+12.5% vs last month", icon: "activity" },
-  { id: 2, label: "Data Archived", value: "4.8 TB", subValue: "2.1M Records this week", icon: "database" },
-  { id: 3, label: "Avg. Run Time", value: "18m 45s", subValue: "-2m 10s from baseline", icon: "clock" },
+  { 
+    id: 1, 
+    label: "Total Tasks Executed", 
+    value: "1,482", 
+    description: "Tasks processed in the selected period",
+    footer: { success: 1464, failed: 18 },
+    icon: "check-circle"
+  },
+  { 
+    id: 2, 
+    label: "Avg. Execution Time", 
+    value: "7m 49s", 
+    description: "Mean duration per archival task",
+    icon: "clock"
+  },
+  { 
+    id: 3, 
+    label: "Active Errors & Warnings", 
+    value: "62", 
+    description: "Unresolved issues across schedules",
+    footer: { success: 0, failed: 48 },
+    icon: "alert-triangle"
+  },
 ];
 
 export const ARCHIVAL_TASKS = [
   {
-    id: "task-1",
-    name: "Customer Activity Log Purge",
-    status: "Active",
-    frequency: "Daily",
-    lastRun: "2024-05-15 02:00 AM",
+    id: "TSK-001",
+    name: "User Log Retention - APAC",
+    dataSource: "[Prod-DB].[Public].[User_Logs]",
+    schedule: "0 0 * * * (Daily)",
+    lastRunStart: "05/20 00:00",
+    lastRunEnd: "05/20 02:45",
+    duration: "2h 45m",
+    status: "Healthy",
+    issues: 2,
     progress: 100,
-    recordsCount: "1.2M",
-    successRate: 99.8,
+    progressLabel: "Verified"
   },
   {
-    id: "task-2",
-    name: "Legacy Invoice Archival",
-    status: "Processing",
-    frequency: "Daily",
-    lastRun: "Running...",
-    progress: 65,
-    recordsCount: "450K",
-    successRate: 100,
-  },
-  {
-    id: "task-3",
-    name: "Temporary Session Cleanup",
+    id: "TSK-002",
+    name: "Transactional Purge 2023",
+    dataSource: "[Azure-Blob].[Finance].[Tx_Recs]",
+    schedule: "0 2 1 * * (Monthly)",
+    lastRunStart: "05/01 02:00",
+    lastRunEnd: "05/01 14:30",
+    duration: "12h 30m",
     status: "Paused",
-    frequency: "Daily",
-    lastRun: "2024-05-14 01:30 AM",
-    progress: 0,
-    recordsCount: "25k",
-    successRate: 85.2,
+    issues: 0,
+    progress: 45,
+    progressLabel: "Moving..."
   },
   {
-    id: "task-4",
-    name: "Global User Metadata Archive",
-    status: "Scheduled",
-    frequency: "Daily",
-    lastRun: "Next: 2024-05-16 00:00 AM",
-    progress: 0,
-    recordsCount: "3.5M",
-    successRate: 99.9,
+    id: "TSK-003",
+    name: "GDPR Compliance Wipe",
+    dataSource: "[Local-HDFS].[Legacy].[Customer]",
+    schedule: "Manual Run",
+    lastRunStart: "05/21 10:15",
+    lastRunEnd: "Running...",
+    duration: "1h 12m",
+    status: "Processing",
+    issues: 0,
+    progress: 72,
+    progressLabel: "Moving..."
+  },
+  {
+    id: "TSK-004",
+    name: "Email Archive v2",
+    dataSource: "[Exchange-V3].[Inbox].[Archive_]",
+    schedule: "0 */6 * * * (6h)",
+    lastRunStart: "05/20 18:00",
+    lastRunEnd: "05/20 19:15",
+    duration: "1h 15m",
+    status: "Critical",
+    issues: 48,
+    warnings: 12,
+    progress: 15,
+    progressLabel: "Moving..."
+  },
+  {
+    id: "TSK-005",
+    name: "Media Assets Backup",
+    dataSource: "[S3-Bucket].[Creative].[Assets_L]",
+    schedule: "0 1 * * 0 (Weekly)",
+    lastRunStart: "05/19 01:00",
+    lastRunEnd: "05/19 08:45",
+    duration: "7h 45m",
+    status: "Healthy",
+    issues: 5,
+    progress: 100,
+    progressLabel: "Verified"
   }
 ];
 
