@@ -40,7 +40,11 @@ export async function generateWhereClause(input: GenerateWhereClauseInput): Prom
 // Prompt definition
 const generateWhereClausePrompt = ai.definePrompt({
   name: 'generateWhereClausePrompt',
-  input: {schema: GenerateWhereClauseInputSchema},
+  input: {
+    schema: GenerateWhereClauseInputSchema.extend({
+      tableSchema: z.string().describe('The stringified table schema.')
+    })
+  },
   output: {schema: GenerateWhereClauseOutputSchema},
   prompt: `You are an expert SQL query builder specializing in creating precise WHERE clauses.
 Your task is to generate a SQL WHERE clause based on a natural language description and a given table schema.
@@ -48,9 +52,9 @@ The generated WHERE clause must be syntactically correct for the specified datab
 Also, provide a clear explanation of the WHERE clause.
 
 Table Schema:
-```json
-{{{json tableSchema}}}
-```
+\`\`\`json
+{{{tableSchema}}}
+\`\`\`
 
 Database Type: {{{databaseType}}}
 
@@ -65,12 +69,12 @@ Instructions:
 6. Provide an explanation that clarifies how the WHERE clause addresses the natural language description.
 
 Example Output Format:
-```json
+\`\`\`json
 {
   "whereClause": "status = 'completed' AND created_at < '2023-01-01'",
   "explanation": "Filters records where the status is 'completed' and the creation date is before January 1st, 2023."
 }
-```
+\`\`\`
 `,
 });
 
@@ -82,7 +86,12 @@ const aiWhereClauseGenerationFlow = ai.defineFlow(
     outputSchema: GenerateWhereClauseOutputSchema,
   },
   async (input) => {
-    const {output} = await generateWhereClausePrompt(input);
+    // Manually stringify the table schema to avoid relying on non-existent Handlebars helpers
+    const {output} = await generateWhereClausePrompt({
+      ...input,
+      tableSchema: JSON.stringify(input.tableSchema, null, 2)
+    });
+    
     if (!output) {
       throw new Error('Failed to generate WHERE clause.');
     }
