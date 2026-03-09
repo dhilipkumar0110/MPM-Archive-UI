@@ -10,8 +10,6 @@ import {
   Clock, 
   Lock, 
   Database as DbIcon,
-  LayoutGrid,
-  List,
   MoreVertical,
   ChevronDown
 } from "lucide-react";
@@ -317,15 +315,6 @@ export default function DataSourcesPage() {
               <SelectItem value="name">Name</SelectItem>
             </SelectContent>
           </Select>
-
-          <div className="flex border rounded-md overflow-hidden bg-white">
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-none bg-blue-50 text-blue-600">
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-none text-slate-400 border-l">
-              <List className="h-4 w-4" />
-            </Button>
-          </div>
 
           <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200 bg-white shadow-sm">
             <Filter className="h-4 w-4 text-slate-500" />
