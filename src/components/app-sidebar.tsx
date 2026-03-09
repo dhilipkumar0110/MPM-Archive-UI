@@ -4,8 +4,6 @@
 import * as React from "react";
 import { 
   LayoutDashboard, 
-  Settings, 
-  History, 
   Database, 
   FileSpreadsheet, 
   Activity,
@@ -50,19 +48,9 @@ const items = [
     icon: CalendarDays,
   },
   {
-    title: "History",
-    url: "/history",
-    icon: History,
-  },
-  {
     title: "Data Sources",
     url: "/sources",
     icon: Database,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ];
 
