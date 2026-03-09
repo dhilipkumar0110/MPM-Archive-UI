@@ -163,3 +163,36 @@ export const TABLE_SCHEMA = [
   { name: "customer_id", type: "INT", description: "Foreign key to customers" },
   { name: "is_active", type: "BOOLEAN", description: "Flag for active status" },
 ];
+
+export const DATA_SOURCES = [
+  {
+    id: "DS-001",
+    name: "Test",
+    server: "Xeon3",
+    owner: "Srinu N",
+    createdAt: "3/1/2026",
+    authType: "Windows Authentication",
+    group: "ECD",
+    status: "Under Review"
+  },
+  {
+    id: "DS-002",
+    name: "Xeon2",
+    server: "Xeon2\\Dev01",
+    owner: "Dhilip Sagadevan",
+    createdAt: "2/19/2026",
+    authType: "SQL Server Authentication",
+    group: "ECD",
+    status: "Active"
+  },
+  {
+    id: "DS-003",
+    name: "EZCAP Datasource",
+    server: "Xeon3",
+    owner: "Srinu N",
+    createdAt: "12/11/2025",
+    authType: "Windows Authentication",
+    group: "GlobalSecurity",
+    status: "Active"
+  }
+];
