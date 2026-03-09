@@ -234,7 +234,7 @@ export default function RulesetsPage() {
               </CardContent>
               <CardFooter className="pt-4 mt-2 border-t border-slate-50 gap-2">
                 <Button asChild className="flex-1 bg-primary hover:bg-primary/90 text-xs h-10 font-bold shadow-sm" size="sm">
-                  <Link href={`/rulesets/${rs.id}/configure`}>
+                  <Link href={`/rulesets/${rs.id}`}>
                     <Settings2 className="h-4 w-4 mr-2" /> Configure
                   </Link>
                 </Button>

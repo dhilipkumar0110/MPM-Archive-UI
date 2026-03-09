@@ -13,7 +13,7 @@ import {
   MessageSquare
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -45,10 +45,11 @@ type Condition = {
 
 export default function WhereClauseBuilderPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   
-  // Robustly extract ID
   const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : null;
+  const tableName = searchParams.get('table') || 'table_name';
 
   const ruleset = useMemo(() => {
     if (!id) return RULESETS[0];
@@ -113,9 +114,9 @@ export default function WhereClauseBuilderPage() {
   const saveConfiguration = () => {
     toast({
       title: "Configuration Saved",
-      description: `Rule for ${ruleset.name} updated successfully.`,
+      description: `Rule for ${tableName} updated successfully.`,
     });
-    router.push("/rulesets");
+    router.push(`/rulesets/${id}`);
   };
 
   if (!ruleset) return <div className="p-8 text-center">Loading ruleset...</div>;
@@ -125,13 +126,16 @@ export default function WhereClauseBuilderPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="icon" className="rounded-full">
-          <Link href="/rulesets">
+          <Link href={`/rulesets/${id}`}>
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Query Builder: {ruleset.name}</h1>
-          <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival.</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Query Builder</h1>
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">{tableName}</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival in ruleset: {ruleset.name}.</p>
         </div>
       </div>
 
@@ -235,7 +239,7 @@ export default function WhereClauseBuilderPage() {
             </CardHeader>
             <CardContent>
               <div className="bg-black/90 text-green-400 p-4 rounded-lg font-mono text-sm border-l-4 border-primary">
-                <span className="text-blue-400">SELECT</span> * <span className="text-blue-400">FROM</span> {ruleset.tables?.[0] || 'table_name'}<br />
+                <span className="text-blue-400">SELECT</span> * <span className="text-blue-400">FROM</span> {tableName}<br />
                 {generatedSql}
               </div>
             </CardContent>
