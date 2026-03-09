@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { 
   CheckCircle2, 
   Clock, 
@@ -44,6 +44,8 @@ import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const getSummaryIcon = (iconName: string) => {
     switch (iconName) {
@@ -56,16 +58,35 @@ export default function DashboardPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "Healthy": return <Badge variant="secondary" className="bg-slate-100 text-slate-800 font-bold px-3 py-1">Healthy</Badge>;
-      case "Processing": return <Badge variant="secondary" className="bg-blue-50 text-blue-600 font-bold px-3 py-1">Processing</Badge>;
+      case "InProgress": return <Badge variant="secondary" className="bg-blue-50 text-blue-600 font-bold px-3 py-1">In Progress</Badge>;
       case "Paused": return <Badge variant="secondary" className="bg-slate-200 text-slate-600 font-bold px-3 py-1">Paused</Badge>;
-      case "Critical": return <Badge variant="destructive" className="bg-red-600 text-white font-bold px-3 py-1">Critical</Badge>;
+      case "Archived": return <Badge variant="secondary" className="bg-orange-50 text-orange-600 font-bold px-3 py-1">Archived</Badge>;
+      case "Completed": return <Badge variant="secondary" className="bg-green-50 text-green-600 font-bold px-3 py-1">Completed</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
   const handleRowDoubleClick = (taskId: string) => {
     router.push(`/tasks/${taskId}`);
+  };
+
+  const filteredTasks = useMemo(() => {
+    return ARCHIVAL_TASKS.filter((task) => {
+      const matchesSearch = 
+        task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.dataSource.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = 
+        statusFilter === "all" || 
+        task.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [searchTerm, statusFilter]);
+
+  const handleRefresh = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
   };
 
   return (
@@ -90,7 +111,7 @@ export default function DashboardPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" className="shadow-sm font-medium">
+          <Button variant="outline" className="shadow-sm font-medium" onClick={handleRefresh}>
             <RotateCw className="h-4 w-4 mr-2" /> Refresh
           </Button>
         </div>
@@ -133,8 +154,12 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-slate-900 font-headline">Active Tasks</h2>
           <div className="flex gap-2">
-            <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-0 font-bold px-3">14 Running Now</Badge>
-            <Badge className="bg-red-50 text-red-500 hover:bg-red-100 border-0 font-bold px-3">2 Failed</Badge>
+            <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-0 font-bold px-3">
+              {ARCHIVAL_TASKS.filter(t => t.status === 'InProgress').length} Running Now
+            </Badge>
+            <Badge className="bg-red-50 text-red-500 hover:bg-red-100 border-0 font-bold px-3">
+              {ARCHIVAL_TASKS.reduce((acc, t) => acc + (t.issues || 0), 0)} Issues
+            </Badge>
           </div>
         </div>
       </div>
@@ -146,17 +171,20 @@ export default function DashboardPage() {
           <Input 
             placeholder="Filter by task name or data source..." 
             className="pl-10 border-slate-200 bg-slate-50/50 focus:bg-white transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Select defaultValue="all">
-          <SelectTrigger className="w-[140px] border-slate-200 bg-white">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px] border-slate-200 bg-white">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="healthy">Healthy</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="critical">Critical</SelectItem>
+            <SelectItem value="InProgress">In Progress</SelectItem>
+            <SelectItem value="Paused">Paused</SelectItem>
+            <SelectItem value="Completed">Completed</SelectItem>
+            <SelectItem value="Archived">Archived</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" size="icon" className="border-slate-200 bg-white">
@@ -181,81 +209,84 @@ export default function DashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ARCHIVAL_TASKS.map((task) => (
-                <TableRow 
-                  key={task.id} 
-                  className="hover:bg-slate-50/30 group cursor-pointer"
-                  onDoubleClick={() => handleRowDoubleClick(task.id)}
-                >
-                  <TableCell className="px-6 py-5">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-800">{task.name}</span>
-                      <span className="text-xs text-slate-400 font-medium uppercase mt-1">{task.id}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-slate-500 font-mono text-xs">{task.dataSource}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center text-slate-600 text-xs">
-                      <Zap className="h-3 w-3 mr-1.5 text-slate-400" />
-                      {task.schedule}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col text-xs text-slate-600">
-                      <span>{task.lastRunStart}</span>
-                      <span className={`italic ${task.lastRunEnd === 'Running...' ? 'text-blue-500' : 'text-slate-400'}`}>
-                        {task.lastRunEnd}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-slate-600 font-medium text-sm">{task.duration}</span>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(task.status)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      {task.issues > 0 ? (
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-red-500" />
-                          <span className="text-xs font-bold text-slate-700">{task.issues}</span>
-                        </div>
-                      ) : task.status === 'Critical' ? (
-                        <span className="text-slate-300">—</span>
-                      ) : (
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4 text-slate-300" />
-                          <span className="text-xs font-bold text-slate-700">{task.issues || 2}</span>
-                        </div>
-                      )}
-                      {(task as any).warnings > 0 && (
-                        <div className="flex items-center gap-1">
-                          <AlertCircle className="h-4 w-4 text-slate-400" />
-                          <span className="text-xs font-bold text-slate-700">{(task as any).warnings}</span>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="pr-6 min-w-[160px]">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                        <span className="text-slate-800">{task.progress}%</span>
-                        <span className="text-slate-400 flex items-center">
-                          {task.progress === 100 && <ShieldCheck className="h-3 w-3 mr-1 text-blue-500" />}
-                          {task.progressLabel}
+              {filteredTasks.length > 0 ? (
+                filteredTasks.map((task) => (
+                  <TableRow 
+                    key={task.id} 
+                    className="hover:bg-slate-50/30 group cursor-pointer"
+                    onDoubleClick={() => handleRowDoubleClick(task.id)}
+                  >
+                    <TableCell className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-800">{task.name}</span>
+                        <span className="text-xs text-slate-400 font-medium uppercase mt-1">{task.id}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-slate-500 font-mono text-xs">{task.dataSource}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center text-slate-600 text-xs">
+                        <Zap className="h-3 w-3 mr-1.5 text-slate-400" />
+                        {task.schedule}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col text-xs text-slate-600">
+                        <span>{task.lastRunStart}</span>
+                        <span className={`italic ${task.lastRunEnd === 'Running...' ? 'text-blue-500' : 'text-slate-400'}`}>
+                          {task.lastRunEnd}
                         </span>
                       </div>
-                      <Progress 
-                        value={task.progress} 
-                        className={`h-2 ${task.progress === 100 ? 'bg-slate-100 [&>div]:bg-blue-600' : 'bg-slate-100 [&>div]:bg-blue-400'}`} 
-                      />
-                    </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-slate-600 font-medium text-sm">{task.duration}</span>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(task.status)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        {task.issues > 0 ? (
+                          <div className="flex items-center gap-1">
+                            <AlertTriangle className="h-4 w-4 text-red-500" />
+                            <span className="text-xs font-bold text-slate-700">{task.issues}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
+                        {(task as any).warnings > 0 && (
+                          <div className="flex items-center gap-1">
+                            <AlertCircle className="h-4 w-4 text-slate-400" />
+                            <span className="text-xs font-bold text-slate-700">{(task as any).warnings}</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="pr-6 min-w-[160px]">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                          <span className="text-slate-800">{task.progress}%</span>
+                          <span className="text-slate-400 flex items-center">
+                            {task.progress === 100 && <ShieldCheck className="h-3 w-3 mr-1 text-blue-500" />}
+                            {task.progressLabel}
+                          </span>
+                        </div>
+                        <Progress 
+                          value={task.progress} 
+                          className={`h-2 ${task.progress === 100 ? 'bg-slate-100 [&>div]:bg-blue-600' : 'bg-slate-100 [&>div]:bg-blue-400'}`} 
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} className="py-20 text-center text-slate-400">
+                    No active tasks match your search or filter criteria.
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -263,7 +294,7 @@ export default function DashboardPage() {
 
       {/* Pagination Footer */}
       <div className="flex items-center justify-between mt-4">
-        <p className="text-sm text-slate-500 italic">Showing 5 of 24 active archival schedules</p>
+        <p className="text-sm text-slate-500 italic">Showing {filteredTasks.length} of {ARCHIVAL_TASKS.length} active archival schedules</p>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="bg-white border-slate-200 font-medium text-slate-600">
             Previous
