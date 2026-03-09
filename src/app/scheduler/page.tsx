@@ -65,6 +65,16 @@ const INITIAL_SCHEDULES: Schedule[] = [
   { id: "SCH-002", taskName: "Transactional Purge 2023", frequency: "Monthly", startDate: "2024-01-01", endDate: "2024-12-31", status: "Active", nextRun: "June 1st, 2024" },
 ];
 
+const DAYS_OF_WEEK = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
 export default function SchedulerPage() {
   const [schedules, setSchedules] = useState<Schedule[]>(INITIAL_SCHEDULES);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -75,6 +85,7 @@ export default function SchedulerPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [monthlyDay, setMonthlyDay] = useState("1");
+  const [weeklyDay, setWeeklyDay] = useState("Monday");
 
   const handleCreateSchedule = () => {
     if (!selectedTaskId || !startDate || !endDate) {
@@ -94,7 +105,11 @@ export default function SchedulerPage() {
       startDate,
       endDate,
       status: "Active",
-      nextRun: frequency === "Daily" ? "Tomorrow, 02:00 AM" : frequency === "Weekly" ? "Next Monday, 02:00 AM" : `Day ${monthlyDay} of next month`,
+      nextRun: frequency === "Daily" 
+        ? "Tomorrow, 02:00 AM" 
+        : frequency === "Weekly" 
+          ? `Next ${weeklyDay}, 02:00 AM` 
+          : `Day ${monthlyDay} of next month`,
     };
 
     setSchedules([newSchedule, ...schedules]);
@@ -162,6 +177,22 @@ export default function SchedulerPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {frequency === "Weekly" && (
+                <div className="grid gap-2 animate-in fade-in slide-in-from-top-1">
+                  <Label className="text-sm font-bold text-slate-700">Day of Week</Label>
+                  <Select value={weeklyDay} onValueChange={setWeeklyDay}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DAYS_OF_WEEK.map(day => (
+                        <SelectItem key={day} value={day}>{day}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {frequency === "Monthly" && (
                 <div className="grid gap-2 animate-in fade-in slide-in-from-top-1">
