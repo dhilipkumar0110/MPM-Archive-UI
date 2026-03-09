@@ -33,6 +33,11 @@ const items = [
     icon: LayoutDashboard,
   },
   {
+    title: "Data Sources",
+    url: "/sources",
+    icon: Database,
+  },
+  {
     title: "Rulesets",
     url: "/rulesets",
     icon: FileSpreadsheet,
@@ -46,11 +51,6 @@ const items = [
     title: "Scheduler",
     url: "/scheduler",
     icon: CalendarDays,
-  },
-  {
-    title: "Data Sources",
-    url: "/sources",
-    icon: Database,
   },
 ];
 
