@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { 
   Plus, 
   Search, 
@@ -11,8 +11,6 @@ import {
   Database,
   Calendar,
   Clock,
-  LayoutGrid,
-  List,
   X,
   PlayCircle,
   Eye
@@ -268,17 +266,9 @@ export default function TasksPage() {
             </SelectContent>
           </Select>
 
-          <div className="flex border rounded-md overflow-hidden h-10">
-            <Button variant="ghost" size="icon" className="h-full rounded-none border-r bg-slate-50">
-              <Filter className="h-4 w-4 text-red-500" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-full rounded-none border-r bg-[#2672DB] text-white">
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-full rounded-none bg-white">
-              <List className="h-4 w-4 text-slate-400" />
-            </Button>
-          </div>
+          <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200 bg-white shadow-sm">
+            <Filter className="h-4 w-4 text-slate-500" />
+          </Button>
         </div>
       </div>
 
