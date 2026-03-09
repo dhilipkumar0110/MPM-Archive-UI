@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -225,7 +224,6 @@ export default function DataSourcesPage() {
                   <SelectContent>
                     <SelectItem value="Windows Authentication">Windows Authentication</SelectItem>
                     <SelectItem value="SQL Server Authentication">SQL Server Authentication</SelectItem>
-                    <SelectItem value="OAuth 2.0">OAuth 2.0</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
