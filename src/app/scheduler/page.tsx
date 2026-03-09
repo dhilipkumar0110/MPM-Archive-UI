@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Plus, 
   Calendar, 
@@ -52,17 +52,39 @@ import { toast } from "@/hooks/use-toast";
 
 type Schedule = {
   id: string;
+  taskId: string;
   taskName: string;
   frequency: "Daily" | "Weekly" | "Monthly";
   startDate: string;
   endDate: string;
   status: "Active" | "Paused" | "Expired";
   nextRun: string;
+  weeklyDay?: string;
+  monthlyDay?: string;
 };
 
 const INITIAL_SCHEDULES: Schedule[] = [
-  { id: "SCH-001", taskName: "User Log Retention - APAC", frequency: "Daily", startDate: "2024-05-01", endDate: "2025-05-01", status: "Active", nextRun: "Tomorrow, 02:00 AM" },
-  { id: "SCH-002", taskName: "Transactional Purge 2023", frequency: "Monthly", startDate: "2024-01-01", endDate: "2024-12-31", status: "Active", nextRun: "June 1st, 2024" },
+  { 
+    id: "SCH-001", 
+    taskId: "TSK-001", 
+    taskName: "User Activity Archive (Production)", 
+    frequency: "Daily", 
+    startDate: "2024-05-01", 
+    endDate: "2025-05-01", 
+    status: "Active", 
+    nextRun: "Tomorrow, 02:00 AM" 
+  },
+  { 
+    id: "SCH-002", 
+    taskId: "TSK-002", 
+    taskName: "Transactional Purge 2023", 
+    frequency: "Monthly", 
+    startDate: "2024-01-01", 
+    endDate: "2024-12-31", 
+    status: "Active", 
+    nextRun: "June 1st, 2024",
+    monthlyDay: "1"
+  },
 ];
 
 const DAYS_OF_WEEK = [
@@ -78,6 +100,7 @@ const DAYS_OF_WEEK = [
 export default function SchedulerPage() {
   const [schedules, setSchedules] = useState<Schedule[]>(INITIAL_SCHEDULES);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
   
   // Form State
   const [selectedTaskId, setSelectedTaskId] = useState("");
@@ -87,7 +110,31 @@ export default function SchedulerPage() {
   const [monthlyDay, setMonthlyDay] = useState("1");
   const [weeklyDay, setWeeklyDay] = useState("Monday");
 
-  const handleCreateSchedule = () => {
+  // Reset form when dialog opens/closes
+  useEffect(() => {
+    if (!isDialogOpen) {
+      setEditingScheduleId(null);
+      setSelectedTaskId("");
+      setFrequency("Daily");
+      setStartDate("");
+      setEndDate("");
+      setMonthlyDay("1");
+      setWeeklyDay("Monday");
+    }
+  }, [isDialogOpen]);
+
+  const handleOpenEdit = (schedule: Schedule) => {
+    setEditingScheduleId(schedule.id);
+    setSelectedTaskId(schedule.taskId);
+    setFrequency(schedule.frequency);
+    setStartDate(schedule.startDate);
+    setEndDate(schedule.endDate);
+    if (schedule.weeklyDay) setWeeklyDay(schedule.weeklyDay);
+    if (schedule.monthlyDay) setMonthlyDay(schedule.monthlyDay);
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveSchedule = () => {
     if (!selectedTaskId || !startDate || !endDate) {
       toast({
         variant: "destructive",
@@ -98,26 +145,53 @@ export default function SchedulerPage() {
     }
 
     const task = ARCHIVAL_TASKS.find(t => t.id === selectedTaskId);
-    const newSchedule: Schedule = {
-      id: `SCH-${Date.now()}`,
-      taskName: task?.name || "Unknown Task",
-      frequency,
-      startDate,
-      endDate,
-      status: "Active",
-      nextRun: frequency === "Daily" 
-        ? "Tomorrow, 02:00 AM" 
-        : frequency === "Weekly" 
-          ? `Next ${weeklyDay}, 02:00 AM` 
-          : `Day ${monthlyDay} of next month`,
-    };
+    const nextRunText = frequency === "Daily" 
+      ? "Tomorrow, 02:00 AM" 
+      : frequency === "Weekly" 
+        ? `Next ${weeklyDay}, 02:00 AM` 
+        : `Day ${monthlyDay} of next month`;
 
-    setSchedules([newSchedule, ...schedules]);
+    if (editingScheduleId) {
+      // Update existing
+      setSchedules(prev => prev.map(s => s.id === editingScheduleId ? {
+        ...s,
+        taskId: selectedTaskId,
+        taskName: task?.name || s.taskName,
+        frequency,
+        startDate,
+        endDate,
+        nextRun: nextRunText,
+        weeklyDay: frequency === "Weekly" ? weeklyDay : undefined,
+        monthlyDay: frequency === "Monthly" ? monthlyDay : undefined,
+      } : s));
+      
+      toast({
+        title: "Schedule Updated",
+        description: `Changes saved for ${task?.name || "the archive task"}.`,
+      });
+    } else {
+      // Create new
+      const newSchedule: Schedule = {
+        id: `SCH-${Date.now()}`,
+        taskId: selectedTaskId,
+        taskName: task?.name || "Unknown Task",
+        frequency,
+        startDate,
+        endDate,
+        status: "Active",
+        nextRun: nextRunText,
+        weeklyDay: frequency === "Weekly" ? weeklyDay : undefined,
+        monthlyDay: frequency === "Monthly" ? monthlyDay : undefined,
+      };
+
+      setSchedules([newSchedule, ...schedules]);
+      toast({
+        title: "Schedule Created",
+        description: `New ${frequency} schedule added for ${newSchedule.taskName}.`,
+      });
+    }
+
     setIsDialogOpen(false);
-    toast({
-      title: "Schedule Created",
-      description: `New ${frequency} schedule added for ${newSchedule.taskName}.`,
-    });
   };
 
   const deleteSchedule = (id: string) => {
@@ -144,7 +218,9 @@ export default function SchedulerPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle className="text-xl font-headline text-[#2672DB]">Configure Schedule</DialogTitle>
+              <DialogTitle className="text-xl font-headline text-[#2672DB]">
+                {editingScheduleId ? "Edit Schedule" : "Configure Schedule"}
+              </DialogTitle>
               <DialogDescription>
                 Set the frequency and timeline for automated task execution.
               </DialogDescription>
@@ -223,7 +299,9 @@ export default function SchedulerPage() {
             </div>
             <DialogFooter>
               <Button variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreateSchedule} className="bg-[#2672DB] hover:bg-[#1E5FB3]">Create Schedule</Button>
+              <Button onClick={handleSaveSchedule} className="bg-[#2672DB] hover:bg-[#1E5FB3]">
+                {editingScheduleId ? "Save Changes" : "Create Schedule"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -252,7 +330,7 @@ export default function SchedulerPage() {
                   <TableCell className="px-6 font-bold text-slate-800">{sch.taskName}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="bg-white border-slate-200">
-                      {sch.frequency}
+                      {sch.frequency} {sch.weeklyDay && `(${sch.weeklyDay})`} {sch.monthlyDay && `(Day ${sch.monthlyDay})`}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs text-slate-500">
@@ -272,7 +350,12 @@ export default function SchedulerPage() {
                   </TableCell>
                   <TableCell className="text-right px-6">
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-slate-400 hover:text-blue-500"
+                        onClick={() => handleOpenEdit(sch)}
+                      >
                         <Edit2 className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
