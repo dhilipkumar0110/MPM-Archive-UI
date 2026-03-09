@@ -12,8 +12,6 @@ import {
   Calendar,
   AlertCircle,
   Zap,
-  ChevronLeft,
-  ChevronRight,
   ShieldCheck
 } from "lucide-react";
 import {
@@ -42,8 +40,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { METADATA_SUMMARY, ARCHIVAL_TASKS } from "@/lib/mock-data";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+  const router = useRouter();
+
   const getSummaryIcon = (iconName: string) => {
     switch (iconName) {
       case "check-circle": return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
@@ -61,6 +62,10 @@ export default function DashboardPage() {
       case "Critical": return <Badge variant="destructive" className="bg-red-600 text-white font-bold px-3 py-1">Critical</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
     }
+  };
+
+  const handleRowDoubleClick = (taskId: string) => {
+    router.push(`/tasks/${taskId}`);
   };
 
   return (
@@ -177,7 +182,11 @@ export default function DashboardPage() {
             </TableHeader>
             <TableBody>
               {ARCHIVAL_TASKS.map((task) => (
-                <TableRow key={task.id} className="hover:bg-slate-50/30 group">
+                <TableRow 
+                  key={task.id} 
+                  className="hover:bg-slate-50/30 group cursor-pointer"
+                  onDoubleClick={() => handleRowDoubleClick(task.id)}
+                >
                   <TableCell className="px-6 py-5">
                     <div className="flex flex-col">
                       <span className="font-bold text-slate-800">{task.name}</span>

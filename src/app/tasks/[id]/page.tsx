@@ -1,24 +1,29 @@
 
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   ArrowLeft, 
-  Calendar, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
+  Database, 
   PlayCircle, 
-  Download,
-  Settings,
-  History
+  Settings2,
+  CheckCircle2, 
+  XCircle,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  Activity,
+  History,
+  FileText,
+  BarChart3,
+  Calendar,
+  Filter
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -33,189 +38,293 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ARCHIVAL_TASKS, TASK_HISTORY } from "@/lib/mock-data";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { 
+  ARCHIVAL_TASKS, 
+  TASK_HISTORY, 
+  LIFETIME_PERFORMANCE,
+  EXECUTION_LOGS 
+} from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
 
 export default function TaskDetailPage() {
   const { id } = useParams();
   const task = ARCHIVAL_TASKS.find(t => t.id === id) || ARCHIVAL_TASKS[0];
+  const [expandedRun, setExpandedRun] = useState<string | null>("RUN-9821");
+
+  const toggleRun = (runId: string) => {
+    setExpandedRun(expandedRun === runId ? null : runId);
+  };
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Breadcrumb & Navigation */}
-      <div className="flex items-center gap-4">
-        <Button asChild variant="ghost" size="icon" className="rounded-full">
-          <Link href="/">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">{task.name}</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <Badge variant="secondary">{task.frequency}</Badge>
-            <span className="text-sm text-muted-foreground">ID: {task.id}</span>
-          </div>
-        </div>
-        <div className="ml-auto flex gap-2">
-          <Button variant="outline" size="sm">
-            <Settings className="h-4 w-4 mr-2" />
-            Edit Rule
-          </Button>
-          <Button size="sm" className="bg-primary hover:bg-primary/90">
-            <PlayCircle className="h-4 w-4 mr-2" />
-            Run Now
-          </Button>
-        </div>
+    <div className="max-w-[1400px] mx-auto space-y-6 pb-20">
+      {/* Top Navigation & Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+        <Link href="/" className="hover:text-primary transition-colors">Dashboard</Link>
+        <span>/</span>
+        <Link href="/tasks" className="hover:text-primary transition-colors">Archive Tasks</Link>
+        <span>/</span>
+        <span className="text-slate-600 font-medium">{task.name}</span>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Status Card */}
-        <Card className="md:col-span-2 shadow-sm border-border/50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold font-headline">Live Progress Monitor</CardTitle>
-              <Badge className="bg-blue-500">{task.status}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
+      {/* Main Header Card */}
+      <Card className="shadow-sm border-slate-200 overflow-hidden">
+        <CardContent className="p-0">
+          <div className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white">
             <div className="space-y-2">
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-muted-foreground">Archiving Batch #4 of 12</span>
-                <span className="font-semibold text-primary">{task.progress}% Complete</span>
-              </div>
-              <Progress value={task.progress} className="h-3" />
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold">Total Scanned</span>
-                <p className="font-bold">2.4M</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold">Processed</span>
-                <p className="font-bold text-primary">1.5M</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold">Failed</span>
-                <p className="font-bold text-destructive">12</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold">Time Elapsed</span>
-                <p className="font-bold">12m 4s</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <History className="h-4 w-4 text-primary" />
-                Latest Logs
-              </h4>
-              <div className="bg-background border border-border/50 rounded-lg p-3 text-xs font-mono space-y-1 overflow-auto max-h-[150px]">
-                <p className="text-muted-foreground text-[10px]">[02:00:01] Initialization started...</p>
-                <p className="text-green-500 text-[10px]">[02:00:05] Connection established with ArchiveDB-Main.</p>
-                <p className="text-muted-foreground text-[10px]">[02:01:12] Processing Batch #1 (100k rows)...</p>
-                <p className="text-muted-foreground text-[10px]">[02:02:45] Batch #1 successfully archived.</p>
-                <p className="text-muted-foreground text-[10px]">[02:03:00] Processing Batch #2 (100k rows)...</p>
-                <p className="text-orange-400 text-[10px]">[02:04:10] Warning: Network latency spike detected (400ms).</p>
-                <p className="text-muted-foreground text-[10px]">[02:05:22] Batch #2 successfully archived.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Info Column */}
-        <div className="space-y-6">
-          <Card className="shadow-sm border-border/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Metadata Info</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-primary" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground">Next Scheduled Run</span>
-                  <span className="text-sm font-medium">Tomorrow, 02:00 AM</span>
+                <h1 className="text-2xl font-bold text-slate-900 font-headline">{task.name}</h1>
+                <Badge variant="secondary" className="bg-slate-100 text-slate-500 font-bold px-3">Active</Badge>
+              </div>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <Database className="h-4 w-4 text-slate-400" />
+                  Source: <span className="font-mono text-slate-600">{task.dataSource.split('.')[0].replace('[', '').replace(']', '')}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  Frequency: <span className="text-slate-600">{task.frequency || 'Weekly (Sunday 02:00 AM)'}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-primary" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground">Average Duration</span>
-                  <span className="text-sm font-medium">14 mins 30 secs</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Database className="h-4 w-4 text-primary" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground">Target Storage</span>
-                  <span className="text-sm font-medium">S3 Cold-Storage-Tier1</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border-border/50 bg-primary/5 border-primary/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-primary uppercase tracking-wider">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              <Button variant="ghost" className="justify-start text-xs font-medium h-8">
-                <Download className="h-3 w-3 mr-2" /> Download Latest Report
+            </div>
+            <div className="flex items-center gap-2">
+              <Button className="bg-primary hover:bg-primary/90 font-bold px-6 shadow-sm">
+                <PlayCircle className="h-4 w-4 mr-2" /> Run Now
               </Button>
-              <Button variant="ghost" className="justify-start text-xs font-medium h-8 text-destructive hover:text-destructive">
-                <PlayCircle className="h-3 w-3 mr-2" /> Force Stop Job
+              <Button variant="outline" size="icon" className="text-slate-400">
+                <Settings2 className="h-4 w-4" />
               </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* History Grid */}
-      <Card className="shadow-sm border-border/50">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-bold font-headline">Execution History</CardTitle>
-          <CardDescription>Comprehensive log of all past executions for this task.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead>Run ID</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Records</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Logs</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {TASK_HISTORY.map((run) => (
-                <TableRow key={run.id} className="hover:bg-accent/5">
-                  <TableCell className="font-medium text-xs text-muted-foreground">#{run.id}</TableCell>
-                  <TableCell className="font-semibold">{run.date}</TableCell>
-                  <TableCell>{run.duration}</TableCell>
-                  <TableCell>{run.records}</TableCell>
-                  <TableCell>
-                    {run.status === "Success" ? (
-                      <div className="flex items-center gap-1 text-green-500 text-xs font-semibold">
-                        <CheckCircle2 className="h-3 w-3" /> {run.status}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1 text-orange-500 text-xs font-semibold">
-                        <AlertCircle className="h-3 w-3" /> {run.status}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="h-8 text-xs underline decoration-primary">
-                      View details
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 border-t border-slate-100">
+            <div className="p-5 border-r border-slate-100 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last Successful Run</p>
+              <p className="font-bold text-slate-700 flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                Oct 18, 2024 02:45 AM
+              </p>
+            </div>
+            <div className="p-5 border-r border-slate-100 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Next Scheduled Run</p>
+              <p className="font-bold text-slate-700 flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-500" />
+                Oct 25, 2024 02:00 AM
+              </p>
+            </div>
+            <div className="p-5 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Average Duration</p>
+              <p className="font-bold text-slate-700">42m 15s</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Main Content Area */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Current Progress Section */}
+          <Card className="shadow-sm border-slate-200">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-end">
+                <div className="space-y-1">
+                  <CardTitle className="text-sm font-bold text-slate-500 uppercase tracking-wider">Current Progress: RUN-9821</CardTitle>
+                  <p className="text-xs text-slate-400">Status: Finalizing Cleanup</p>
+                </div>
+                <div className="text-4xl font-black text-primary font-headline">100%</div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <Progress value={100} className="h-2.5 bg-slate-100 [&>div]:bg-primary" />
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Duration</p>
+                  <p className="text-lg font-bold text-slate-800">45m 12s</p>
+                </div>
+                <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Rows Archived</p>
+                  <p className="text-lg font-bold text-slate-800">125,400</p>
+                </div>
+                <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Errors</p>
+                  <p className="text-lg font-bold text-slate-800">0</p>
+                </div>
+                <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Throughput</p>
+                  <p className="text-lg font-bold text-slate-800">2,786 r/s</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Detailed Tabs Area */}
+          <div className="space-y-4">
+            <Tabs defaultValue="runs-history" className="w-full">
+              <div className="flex items-center justify-between border-b border-slate-200 mb-4">
+                <TabsList className="bg-transparent h-auto p-0 gap-8">
+                  <TabsTrigger value="runs-history" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 font-bold text-slate-400 data-[state=active]:text-primary text-sm">
+                    Runs History
+                  </TabsTrigger>
+                  <TabsTrigger value="configuration" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 font-bold text-slate-400 data-[state=active]:text-primary text-sm">
+                    Configuration
+                  </TabsTrigger>
+                  <TabsTrigger value="system-logs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 font-bold text-slate-400 data-[state=active]:text-primary text-sm">
+                    System Logs
+                  </TabsTrigger>
+                </TabsList>
+                <Button variant="ghost" size="sm" className="text-slate-400 text-xs font-bold uppercase">
+                  <Filter className="h-3 w-3 mr-1.5" /> Filter
+                </Button>
+              </div>
+
+              <TabsContent value="runs-history" className="mt-0">
+                <Card className="shadow-sm border-slate-200 overflow-hidden">
+                  <Table>
+                    <TableHeader className="bg-slate-50/30">
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="w-[40px]"></TableHead>
+                        <TableHead className="font-bold text-slate-500 uppercase text-[10px] tracking-widest py-4">Run ID</TableHead>
+                        <TableHead className="font-bold text-slate-500 uppercase text-[10px] tracking-widest py-4">Start Time</TableHead>
+                        <TableHead className="font-bold text-slate-500 uppercase text-[10px] tracking-widest py-4">Duration</TableHead>
+                        <TableHead className="font-bold text-slate-500 uppercase text-[10px] tracking-widest py-4">Status</TableHead>
+                        <TableHead className="font-bold text-slate-500 uppercase text-[10px] tracking-widest py-4 text-right">Rows</TableHead>
+                        <TableHead className="font-bold text-slate-500 uppercase text-[10px] tracking-widest py-4 text-right pr-6">Errors</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {TASK_HISTORY.map((run) => (
+                        <React.Fragment key={run.id}>
+                          <TableRow className="group hover:bg-slate-50/30 border-slate-100 cursor-pointer" onClick={() => toggleRun(run.id)}>
+                            <TableCell className="py-4">
+                              {expandedRun === run.id ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                            </TableCell>
+                            <TableCell className="font-bold text-primary text-xs tracking-tight py-4">{run.id}</TableCell>
+                            <TableCell className="text-slate-600 font-medium text-xs py-4">{run.date}</TableCell>
+                            <TableCell className="text-slate-600 font-medium text-xs py-4">{run.duration}</TableCell>
+                            <TableCell className="py-4">
+                              <Badge variant="outline" className={cn(
+                                "font-bold text-[10px] px-2 py-0.5 rounded-full border-0",
+                                run.status === 'Success' ? "bg-green-50 text-green-600" : 
+                                run.status === 'Failed' ? "bg-red-50 text-red-600" : "bg-orange-50 text-orange-600"
+                              )}>
+                                {run.status === 'Success' ? <CheckCircle2 className="h-3 w-3 mr-1 inline" /> : run.status === 'Failed' ? <XCircle className="h-3 w-3 mr-1 inline" /> : <Clock className="h-3 w-3 mr-1 inline" />}
+                                {run.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right font-bold text-slate-700 text-xs py-4">{run.records}</TableCell>
+                            <TableCell className={cn("text-right font-bold text-xs py-4 pr-6", run.status === 'Failed' ? "text-red-500" : "text-slate-400")}>
+                              {run.status === 'Failed' ? '1' : '0'}
+                            </TableCell>
+                          </TableRow>
+                          
+                          {expandedRun === run.id && (
+                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                              <TableCell colSpan={7} className="p-0">
+                                <div className="p-6 space-y-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                      <Activity className="h-3 w-3" /> Execution Log Snippet
+                                    </div>
+                                    <Button variant="link" size="sm" className="text-primary font-bold text-xs p-0 h-auto">View Full Log</Button>
+                                  </div>
+                                  <div className="bg-white border border-slate-200 rounded-lg p-5 font-mono text-xs text-slate-600 space-y-2.5 shadow-sm">
+                                    {EXECUTION_LOGS.map((log, i) => (
+                                      <div key={i} className="flex gap-3">
+                                        <span className="text-slate-300 w-6">[{i + 1}]</span>
+                                        <span>{log}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="configuration">
+                <Card className="p-10 text-center space-y-4 shadow-sm border-slate-200">
+                  <div className="flex justify-center">
+                    <div className="p-4 bg-slate-50 rounded-full">
+                      <Settings2 className="h-8 w-8 text-slate-300" />
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-slate-800">Configuration Details</h3>
+                  <p className="text-sm text-slate-500 max-w-md mx-auto">This section displays the rulesets, mapping, and connection parameters for this archival task.</p>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="system-logs">
+                <Card className="p-10 text-center space-y-4 shadow-sm border-slate-200">
+                  <div className="flex justify-center">
+                    <div className="p-4 bg-slate-50 rounded-full">
+                      <FileText className="h-8 w-8 text-slate-300" />
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-slate-800">System Activity Logs</h3>
+                  <p className="text-sm text-slate-500 max-w-md mx-auto">Detailed system-level logs for troubleshooting engine orchestration and network events.</p>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+
+        {/* Sidebar Sidebar area */}
+        <div className="space-y-6">
+          <Card className="shadow-sm border-slate-200 overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
+              <CardTitle className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                <BarChart3 className="h-3.5 w-3.5" /> Lifetime Performance
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 space-y-4">
+              {LIFETIME_PERFORMANCE.map((metric, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-white hover:border-slate-200 transition-colors shadow-sm">
+                  <div className="p-2.5 bg-slate-50 rounded-lg">
+                    {metric.icon}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{metric.label}</span>
+                    <span className="text-lg font-bold text-slate-800">{metric.value}</span>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Quick Stats Summary Card */}
+          <Card className="bg-primary/5 border-primary/10 shadow-sm p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <h3 className="font-bold text-primary text-sm">Engine Status: Verified</h3>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">This task is currently monitored by the compliance engine and maintains 100% data integrity score.</p>
+          </Card>
+        </div>
+      </div>
+
+      {/* Footer Branding Area */}
+      <div className="pt-10 mt-10 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <div className="flex items-center gap-4">
+          <span>© 2026 Archiv Data Systems</span>
+          <span className="flex items-center gap-1.5"><ShieldCheck className="h-3 w-3" /> System Secure</span>
+        </div>
+        <div className="flex items-center gap-6">
+          <Link href="#" className="hover:text-primary">Documentation</Link>
+          <Link href="#" className="hover:text-primary">Support</Link>
+          <span className="text-slate-300">v2.4.0-stable</span>
+        </div>
+      </div>
     </div>
   );
 }

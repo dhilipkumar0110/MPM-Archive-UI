@@ -1,4 +1,7 @@
 
+import React from 'react';
+import { Database, ShieldCheck, Clock, CheckCircle2 } from 'lucide-react';
+
 export const METADATA_SUMMARY = [
   { 
     id: 1, 
@@ -28,12 +31,13 @@ export const METADATA_SUMMARY = [
 export const ARCHIVAL_TASKS = [
   {
     id: "TSK-001",
-    name: "User Log Retention - APAC",
+    name: "User Activity Archive (Production)",
     dataSource: "[Prod-DB].[Public].[User_Logs]",
     ruleSet: "User Log Retention Rules",
     sourceDb: "Xeon2",
     targetDb: "6X_CCI_Backup",
     schedule: "0 0 * * * (Daily)",
+    frequency: "Weekly (Sunday 02:00 AM)",
     lastRunStart: "05/20 00:00",
     lastRunEnd: "05/20 02:45",
     modifiedOn: "02-24-2026",
@@ -52,6 +56,7 @@ export const ARCHIVAL_TASKS = [
     sourceDb: "ECD Datasource",
     targetDb: "EPDB-6.9",
     schedule: "0 2 1 * * (Monthly)",
+    frequency: "Monthly",
     lastRunStart: "05/01 02:00",
     lastRunEnd: "05/01 14:30",
     modifiedOn: "12-09-2025",
@@ -70,6 +75,7 @@ export const ARCHIVAL_TASKS = [
     sourceDb: "Local-HDFS",
     targetDb: "Archive-Compliance",
     schedule: "Manual Run",
+    frequency: "Manual",
     lastRunStart: "05/21 10:15",
     lastRunEnd: "Running...",
     modifiedOn: "05-21-2026",
@@ -88,6 +94,7 @@ export const ARCHIVAL_TASKS = [
     sourceDb: "Exchange-V3",
     targetDb: "Cold-S3",
     schedule: "0 */6 * * * (6h)",
+    frequency: "Daily",
     lastRunStart: "05/20 18:00",
     lastRunEnd: "05/20 19:15",
     modifiedOn: "01-15-2026",
@@ -107,6 +114,7 @@ export const ARCHIVAL_TASKS = [
     sourceDb: "S3-Bucket",
     targetDb: "Glacier-Deep",
     schedule: "0 1 * * 0 (Weekly)",
+    frequency: "Weekly",
     lastRunStart: "05/19 01:00",
     lastRunEnd: "05/19 08:45",
     modifiedOn: "03-10-2026",
@@ -120,10 +128,25 @@ export const ARCHIVAL_TASKS = [
 ];
 
 export const TASK_HISTORY = [
-  { id: "run-101", date: "2024-05-15 02:00 AM", duration: "14m 2s", records: "1.21M", status: "Success" },
-  { id: "run-100", date: "2024-05-14 02:00 AM", duration: "15m 10s", records: "1.19M", status: "Success" },
-  { id: "run-099", date: "2024-05-13 02:05 AM", duration: "16m 45s", records: "1.25M", status: "Warning" },
-  { id: "run-098", date: "2024-05-12 02:01 AM", duration: "13m 50s", records: "1.10M", status: "Success" },
+  { id: "RUN-9821", date: "2024-10-18 02:00 AM", duration: "45m 12s", records: "125,400", status: "Success" },
+  { id: "RUN-9755", date: "2024-10-11 02:00 AM", duration: "22m 05s", records: "12,000", status: "Failed" },
+  { id: "RUN-9690", date: "2024-10-04 02:00 AM", duration: "55m 30s", records: "188,000", status: "Success" },
+  { id: "RUN-9620", date: "2024-09-27 02:00 AM", duration: "40m 10s", records: "142,000", status: "Success" },
+  { id: "RUN-9550", date: "2024-09-20 02:00 AM", duration: "50m 00s", records: "165,000", status: "Success" },
+];
+
+export const LIFETIME_PERFORMANCE = [
+  { label: "Total Data Moved", value: "4.2 TB", icon: React.createElement(Database, { className: "h-5 w-5 text-blue-500" }) },
+  { label: "Success Rate", value: "98.2%", icon: React.createElement(ShieldCheck, { className: "h-5 w-5 text-green-500" }) },
+  { label: "Next Scheduled", value: "2d 12h", icon: React.createElement(Clock, { className: "h-5 w-5 text-slate-400" }) },
+];
+
+export const EXECUTION_LOGS = [
+  "Connecting to source...",
+  "Batch 1: 50,000 rows moved",
+  "Batch 2: 75,400 rows moved",
+  "Cleaning up temporary buffers...",
+  "Success.",
 ];
 
 export const RULESETS = [
