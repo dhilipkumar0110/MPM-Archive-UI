@@ -9,6 +9,7 @@ import {
   Database, 
   FileSpreadsheet, 
   Activity,
+  CalendarDays,
   ChevronRight
 } from "lucide-react";
 import Link from "next/link";
@@ -42,6 +43,11 @@ const items = [
     title: "Archive Tasks",
     url: "/tasks",
     icon: Activity,
+  },
+  {
+    title: "Scheduler",
+    url: "/scheduler",
+    icon: CalendarDays,
   },
   {
     title: "History",

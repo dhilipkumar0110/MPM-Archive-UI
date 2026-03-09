@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   Plus, 
   Search, 
@@ -14,9 +14,10 @@ import {
   LayoutGrid,
   List,
   X,
-  ChevronDown,
+  PlayCircle,
   Eye
 } from "lucide-react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -27,12 +28,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -70,7 +65,7 @@ export default function TasksPage() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
-      const matchesTab = activeTab === "All" || task.status === activeTab;
+      const matchesTab = task.status === activeTab;
       const matchesSearch = task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            task.ruleSet?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesTab && matchesSearch;
@@ -98,7 +93,7 @@ export default function TasksPage() {
       startedOn: "Pending...",
       progress: 0,
       issues: 0,
-      dataSource: "Unknown",
+      dataSource: `${sourceDb}.${selectedRuleSet}`,
       schedule: "Manual",
       lastRunStart: "N/A",
       lastRunEnd: "N/A",
@@ -113,9 +108,23 @@ export default function TasksPage() {
     setSourceDb("");
     setTargetDb("");
 
+    // Automatically navigate to 'New' tab when a task is created
+    setActiveTab("New");
+
     toast({
       title: "Task Created",
-      description: `"${newTaskName}" has been successfully added.`,
+      description: `"${newTaskName}" has been successfully added to New tasks.`,
+    });
+  };
+
+  const handleExecuteNow = (taskId: string) => {
+    setTasks(prev => prev.map(t => 
+      t.id === taskId ? { ...t, status: "InProgress", startedOn: "Just now", progress: 5 } : t
+    ));
+    setActiveTab("InProgress");
+    toast({
+      title: "Execution Started",
+      description: "The archive task is now running in the background.",
     });
   };
 
@@ -128,6 +137,10 @@ export default function TasksPage() {
         return <Badge variant="secondary" className="bg-slate-100 text-slate-500 hover:bg-slate-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
       case "Completed":
         return <Badge variant="secondary" className="bg-green-100 text-green-600 hover:bg-green-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
+      case "New":
+        return <Badge variant="secondary" className="bg-purple-100 text-purple-600 hover:bg-purple-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
+      case "Scheduled":
+        return <Badge variant="secondary" className="bg-orange-100 text-orange-600 hover:bg-orange-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
       default:
         return <Badge variant="secondary" className="bg-slate-100 text-slate-500 hover:bg-slate-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
     }
@@ -137,7 +150,7 @@ export default function TasksPage() {
     <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight text-[#2672DB] font-headline">Scrub Tasks</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[#2672DB] font-headline">Archive Tasks</h1>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -147,7 +160,7 @@ export default function TasksPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle className="text-xl font-headline text-[#2672DB]">Create New Scrub Task</DialogTitle>
+              <DialogTitle className="text-xl font-headline text-[#2672DB]">Create New Archive Task</DialogTitle>
               <DialogDescription>
                 Define the parameters for your data archival or scrub process.
               </DialogDescription>
@@ -235,7 +248,7 @@ export default function TasksPage() {
         <div className="relative flex-1 min-w-[300px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input 
-            placeholder="Search scrub tasks..." 
+            placeholder="Search archive tasks..." 
             className="pl-10 border-slate-200 bg-slate-50/30 focus:bg-white transition-all h-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -243,10 +256,6 @@ export default function TasksPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="flex items-center px-3 py-1.5 border rounded-md bg-white text-xs font-medium text-slate-600">
-            All <X className="h-3 w-3 ml-2 text-slate-400 cursor-pointer" />
-          </div>
-          
           <Select defaultValue="created">
             <SelectTrigger className="w-[180px] h-10 border-slate-200">
               <span className="text-slate-400 mr-2">Sort by:</span>
@@ -311,20 +320,18 @@ export default function TasksPage() {
                 <div className="flex items-center gap-3 text-slate-500">
                   <Clock className="h-4 w-4 text-[#00D1FF]" />
                   <span className="text-xs font-medium">
-                    {task.status === "Paused" ? "Paused On " : "Started On "} 
+                    {task.status === "InProgress" ? "Started On " : "Registered "} 
                     {task.startedOn || "02-24-2026 17:15:30"}
                   </span>
                 </div>
               </CardContent>
               <CardFooter className="pt-2 flex flex-col gap-2">
-                <div className="flex gap-3 w-full">
-                  <Button variant="outline" className="flex-1 border-[#2672DB] text-[#2672DB] hover:bg-blue-50 font-medium h-9 text-xs">
-                    {task.status === "Paused" ? "Resume" : "Pause"}
-                  </Button>
-                  <Button variant="outline" className="flex-1 border-[#2672DB] text-[#2672DB] hover:bg-blue-50 font-medium h-9 text-xs">
-                    Cancel
-                  </Button>
-                </div>
+                <Button 
+                  onClick={() => handleExecuteNow(task.id)}
+                  className="w-full bg-[#2672DB] hover:bg-[#1E5FB3] text-white font-bold h-10 shadow-sm"
+                >
+                  <PlayCircle className="h-4 w-4 mr-2" /> Execute Now
+                </Button>
                 <Button variant="ghost" className="w-full text-[#2672DB] hover:text-[#1E5FB3] font-bold text-xs h-9" asChild>
                   <Link href={`/tasks/${task.id}`}>
                     <Eye className="h-3 w-3 mr-2" /> View Progress
@@ -338,13 +345,11 @@ export default function TasksPage() {
             <div className="flex justify-center">
               <Search className="h-10 w-10 text-slate-200" />
             </div>
-            <p className="text-slate-400 font-medium">No scrub tasks found matching your criteria.</p>
-            <Button variant="link" onClick={() => {setActiveTab("All"); setSearchTerm("");}} className="text-[#2672DB]">Clear all filters</Button>
+            <p className="text-slate-400 font-medium">No tasks found in the {activeTab} tab.</p>
+            <Button variant="link" onClick={() => {setActiveTab("InProgress"); setSearchTerm("");}} className="text-[#2672DB]">Back to Active Tasks</Button>
           </div>
         )}
       </div>
     </div>
   );
 }
-
-import Link from "next/link";
