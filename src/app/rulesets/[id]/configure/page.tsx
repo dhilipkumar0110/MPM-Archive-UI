@@ -1,23 +1,19 @@
-
 "use client";
 
 import React, { useState, useMemo } from "react";
 import { 
   ArrowLeft, 
-  Sparkles, 
   Plus, 
   Trash2, 
   Save, 
   Code,
-  Database,
-  MessageSquare
+  Database
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,7 +28,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { RULESETS, TABLE_SCHEMA } from "@/lib/mock-data";
-import { generateWhereClause } from "@/ai/flows/ai-where-clause-generation";
 import { toast } from "@/hooks/use-toast";
 
 type Condition = {
@@ -59,8 +54,6 @@ export default function WhereClauseBuilderPage() {
   const [conditions, setConditions] = useState<Condition[]>([
     { id: "1", column: "created_at", operator: "<", value: "2023-01-01", join: "AND" }
   ]);
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedSql, setGeneratedSql] = useState("WHERE created_at < '2023-01-01'");
 
   const addCondition = () => {
@@ -82,33 +75,6 @@ export default function WhereClauseBuilderPage() {
 
   const updateCondition = (condId: string, fields: Partial<Condition>) => {
     setConditions(conditions.map(c => c.id === condId ? { ...c, ...fields } : c));
-  };
-
-  const handleAiGeneration = async () => {
-    if (!aiPrompt) return;
-    setIsGenerating(true);
-    try {
-      const result = await generateWhereClause({
-        naturalLanguageDescription: aiPrompt,
-        tableSchema: TABLE_SCHEMA,
-        databaseType: "PostgreSQL"
-      });
-      if (result?.whereClause) {
-        setGeneratedSql(`WHERE ${result.whereClause}`);
-        toast({
-          title: "AI Suggestion Ready",
-          description: result.explanation,
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "AI Generation Failed",
-        description: "Could not generate clause from the prompt.",
-      });
-    } finally {
-      setIsGenerating(false);
-    }
   };
 
   const saveConfiguration = () => {
@@ -246,48 +212,8 @@ export default function WhereClauseBuilderPage() {
           </Card>
         </div>
 
-        {/* AI & Sidebar Area */}
+        {/* Sidebar Area */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="shadow-sm border-primary/20 bg-gradient-to-br from-white to-primary/5">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-primary/10 rounded-lg">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                </div>
-                <CardTitle className="text-base font-bold font-headline">AI Assistant</CardTitle>
-              </div>
-              <CardDescription>
-                Describe your requirements in plain English and let AI build the clause.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative">
-                <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <textarea 
-                  className="w-full min-h-[120px] bg-white border border-border/60 rounded-xl p-3 pl-10 text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
-                  placeholder="e.g. Find all records where status is inactive and were created before last summer..."
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                />
-              </div>
-              <Button 
-                className="w-full bg-primary hover:bg-primary/90 text-sm font-semibold"
-                onClick={handleAiGeneration}
-                disabled={isGenerating || !aiPrompt}
-              >
-                {isGenerating ? (
-                  <span className="flex items-center">
-                    <Sparkles className="h-4 w-4 mr-2 animate-spin" /> Analyzing Schema...
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <Sparkles className="h-4 w-4 mr-2" /> Generate Condition
-                  </span>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-
           <Card className="shadow-sm border-border/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-bold font-headline flex items-center gap-2">
@@ -296,7 +222,7 @@ export default function WhereClauseBuilderPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="max-h-[300px] overflow-auto px-6 py-2">
+              <div className="max-h-[400px] overflow-auto px-6 py-2">
                 {TABLE_SCHEMA.map(col => (
                   <div key={col.name} className="flex justify-between items-center py-2 border-b border-border/30 last:border-0 group cursor-help">
                     <div className="flex flex-col">
