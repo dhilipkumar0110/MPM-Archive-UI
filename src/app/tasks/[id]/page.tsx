@@ -17,7 +17,8 @@ import {
   FileText,
   BarChart3,
   Calendar,
-  Filter
+  Filter,
+  ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
