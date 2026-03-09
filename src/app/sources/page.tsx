@@ -56,6 +56,7 @@ type DataSource = {
   authType: string;
   group: string;
   status: string;
+  username?: string;
 };
 
 export default function DataSourcesPage() {
@@ -69,6 +70,8 @@ export default function DataSourcesPage() {
   const [server, setServer] = useState("");
   const [authType, setAuthType] = useState("");
   const [database, setDatabase] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const filteredSources = useMemo(() => {
     return sources.filter(source => 
@@ -84,12 +87,16 @@ export default function DataSourcesPage() {
       setServer(source.server);
       setAuthType(source.authType);
       setDatabase("");
+      setUsername(source.username || "");
+      setPassword("");
     } else {
       setEditingSource(null);
       setName("");
       setServer("");
-      setAuthType("");
+      setAuthType("Windows Authentication");
       setDatabase("");
+      setUsername("");
+      setPassword("");
     }
     setIsDialogOpen(true);
   };
@@ -104,12 +111,22 @@ export default function DataSourcesPage() {
       return;
     }
 
+    if (authType === "SQL Server Authentication" && (!username || !password)) {
+      toast({
+        variant: "destructive",
+        title: "Credentials Required",
+        description: "Please enter a username and password for SQL Server authentication.",
+      });
+      return;
+    }
+
     if (editingSource) {
       setSources(prev => prev.map(s => s.id === editingSource.id ? {
         ...s,
         name,
         server,
         authType,
+        username: authType === "SQL Server Authentication" ? username : undefined,
       } : s));
       toast({
         title: "Data Source Updated",
@@ -124,7 +141,8 @@ export default function DataSourcesPage() {
         createdAt: new Date().toLocaleDateString(),
         authType,
         group: "ECD",
-        status: "Under Review"
+        status: "Under Review",
+        username: authType === "SQL Server Authentication" ? username : undefined,
       };
       setSources([newSource, ...sources]);
       toast({
@@ -211,6 +229,31 @@ export default function DataSourcesPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {authType === "SQL Server Authentication" && (
+                <div className="grid gap-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="grid gap-2">
+                    <Label className="text-sm font-bold text-slate-700">Username</Label>
+                    <Input
+                      placeholder="Enter username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="border-slate-200"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-sm font-bold text-slate-700">Password</Label>
+                    <Input
+                      type="password"
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="border-slate-200"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="grid gap-2">
                 <Label className="text-sm font-bold text-slate-700">Database (Optional)</Label>
                 <Select value={database} onValueChange={setDatabase}>
