@@ -3,7 +3,6 @@
 
 import React, { useState } from "react";
 import { 
-  ArrowLeft, 
   Database, 
   PlayCircle, 
   Settings2,
@@ -13,10 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   Activity,
-  History,
-  FileText,
   BarChart3,
-  Calendar,
   Filter,
   ShieldCheck
 } from "lucide-react";
@@ -172,12 +168,6 @@ export default function TaskDetailPage() {
                   <TabsTrigger value="runs-history" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 font-bold text-slate-400 data-[state=active]:text-primary text-sm">
                     Runs History
                   </TabsTrigger>
-                  <TabsTrigger value="configuration" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 font-bold text-slate-400 data-[state=active]:text-primary text-sm">
-                    Configuration
-                  </TabsTrigger>
-                  <TabsTrigger value="system-logs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 font-bold text-slate-400 data-[state=active]:text-primary text-sm">
-                    System Logs
-                  </TabsTrigger>
                 </TabsList>
                 <Button variant="ghost" size="sm" className="text-slate-400 text-xs font-bold uppercase">
                   <Filter className="h-3 w-3 mr-1.5" /> Filter
@@ -252,35 +242,11 @@ export default function TaskDetailPage() {
                   </Table>
                 </Card>
               </TabsContent>
-
-              <TabsContent value="configuration">
-                <Card className="p-10 text-center space-y-4 shadow-sm border-slate-200">
-                  <div className="flex justify-center">
-                    <div className="p-4 bg-slate-50 rounded-full">
-                      <Settings2 className="h-8 w-8 text-slate-300" />
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-slate-800">Configuration Details</h3>
-                  <p className="text-sm text-slate-500 max-w-md mx-auto">This section displays the rulesets, mapping, and connection parameters for this archival task.</p>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="system-logs">
-                <Card className="p-10 text-center space-y-4 shadow-sm border-slate-200">
-                  <div className="flex justify-center">
-                    <div className="p-4 bg-slate-50 rounded-full">
-                      <FileText className="h-8 w-8 text-slate-300" />
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-slate-800">System Activity Logs</h3>
-                  <p className="text-sm text-slate-500 max-w-md mx-auto">Detailed system-level logs for troubleshooting engine orchestration and network events.</p>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
         </div>
 
-        {/* Sidebar Sidebar area */}
+        {/* Sidebar area */}
         <div className="space-y-6">
           <Card className="shadow-sm border-slate-200 overflow-hidden">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
