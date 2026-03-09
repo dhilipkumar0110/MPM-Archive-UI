@@ -10,8 +10,6 @@ import {
   Clock, 
   Lock, 
   Database as DbIcon,
-  MoreVertical,
-  ChevronDown
 } from "lucide-react";
 import {
   Card,
@@ -26,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -59,23 +56,39 @@ type DataSource = {
 export default function DataSourcesPage() {
   const [sources, setSources] = useState<DataSource[]>(DATA_SOURCES);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("created");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSource, setEditingSource] = useState<DataSource | null>(null);
 
   // Form State
   const [name, setName] = useState("");
   const [server, setServer] = useState("");
-  const [authType, setAuthType] = useState("");
+  const [authType, setAuthType] = useState("Windows Authentication");
   const [database, setDatabase] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const filteredSources = useMemo(() => {
-    return sources.filter(source => 
-      source.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      source.server.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [sources, searchTerm]);
+    let result = sources.filter(source => {
+      const matchesSearch = source.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            source.server.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === "all" || 
+                            (statusFilter === "active" && source.status === "Active") ||
+                            (statusFilter === "under-review" && source.status === "Under Review");
+      
+      return matchesSearch && matchesStatus;
+    });
+
+    if (sortBy === "name") {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
+    return result;
+  }, [sources, searchTerm, statusFilter, sortBy]);
 
   const handleOpenDialog = (source?: DataSource) => {
     if (source) {
@@ -273,7 +286,7 @@ export default function DataSourcesPage() {
               <Button variant="outline" className="flex-1 border-slate-300 font-bold" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSaveSource} className="flex-1 bg-red-300 hover:bg-red-400 text-white font-bold border-0">
+              <Button onClick={handleSaveSource} className="flex-1 bg-[#2672DB] hover:bg-[#1E5FB3] text-white font-bold border-0">
                 {editingSource ? "Save Changes" : "Add Data Source"}
               </Button>
             </DialogFooter>
@@ -294,8 +307,8 @@ export default function DataSourcesPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[120px] h-10 border-slate-200">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[140px] h-10 border-slate-200">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent>
@@ -305,7 +318,7 @@ export default function DataSourcesPage() {
             </SelectContent>
           </Select>
 
-          <Select defaultValue="created">
+          <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[180px] h-10 border-slate-200">
               <span className="text-slate-400 mr-2">Sort by:</span>
               <SelectValue />
@@ -324,64 +337,80 @@ export default function DataSourcesPage() {
 
       {/* Grid */}
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {filteredSources.map((source) => (
-          <Card key={source.id} className="shadow-sm border-slate-100 flex flex-col hover:shadow-md transition-all group relative overflow-hidden bg-white">
-            <CardHeader className="pb-4">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-[17px] font-bold text-[#2672DB] leading-tight">
-                  {source.name}
-                </CardTitle>
-                <Badge 
-                  variant="secondary" 
-                  className={cn(
-                    "font-bold px-2 py-0.5 text-[10px] tracking-wider border-0",
-                    source.status === "Active" ? "bg-blue-100 text-blue-600" : "bg-orange-100 text-orange-600"
-                  )}
+        {filteredSources.length > 0 ? (
+          filteredSources.map((source) => (
+            <Card key={source.id} className="shadow-sm border-slate-100 flex flex-col hover:shadow-md transition-all group relative overflow-hidden bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-[17px] font-bold text-[#2672DB] leading-tight">
+                    {source.name}
+                  </CardTitle>
+                  <Badge 
+                    variant="secondary" 
+                    className={cn(
+                      "font-bold px-2 py-0.5 text-[10px] tracking-wider border-0",
+                      source.status === "Active" ? "bg-blue-100 text-blue-600" : "bg-orange-100 text-orange-600"
+                    )}
+                  >
+                    {source.status.toUpperCase()}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1 space-y-3 pb-6">
+                <div className="flex items-center gap-3 text-slate-600 text-sm">
+                  <Globe className="h-4 w-4 text-[#00D1FF]" />
+                  <span className="font-medium">{source.server}</span>
+                </div>
+                <div className="flex items-center gap-3 text-slate-600 text-sm">
+                  <User className="h-4 w-4 text-[#00D1FF]" />
+                  <span className="font-medium">{source.owner}</span>
+                </div>
+                <div className="flex items-center gap-3 text-slate-600 text-sm">
+                  <Clock className="h-4 w-4 text-[#00D1FF]" />
+                  <span className="font-medium tracking-tight">Created on {source.createdAt}</span>
+                </div>
+                <div className="flex items-center gap-3 text-slate-600 text-sm">
+                  <Lock className="h-4 w-4 text-[#00D1FF]" />
+                  <span className="font-medium">{source.authType}</span>
+                </div>
+                <div className="flex items-center gap-3 text-slate-600 text-sm">
+                  <DbIcon className="h-4 w-4 text-[#00D1FF]" />
+                  <span className="font-medium">{source.group}</span>
+                </div>
+              </CardContent>
+              <CardFooter className="pt-2 border-t border-slate-50 gap-4 flex bg-slate-50/30 px-6 py-4">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 border-[#2672DB] text-[#2672DB] hover:bg-blue-50 font-bold h-10 shadow-sm"
+                  onClick={() => toggleStatus(source.id)}
                 >
-                  {source.status.toUpperCase()}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 space-y-3 pb-6">
-              <div className="flex items-center gap-3 text-slate-600 text-sm">
-                <Globe className="h-4 w-4 text-[#00D1FF]" />
-                <span className="font-medium">{source.server}</span>
-              </div>
-              <div className="flex items-center gap-3 text-slate-600 text-sm">
-                <User className="h-4 w-4 text-[#00D1FF]" />
-                <span className="font-medium">{source.owner}</span>
-              </div>
-              <div className="flex items-center gap-3 text-slate-600 text-sm">
-                <Clock className="h-4 w-4 text-[#00D1FF]" />
-                <span className="font-medium tracking-tight">Created on {source.createdAt}</span>
-              </div>
-              <div className="flex items-center gap-3 text-slate-600 text-sm">
-                <Lock className="h-4 w-4 text-[#00D1FF]" />
-                <span className="font-medium">{source.authType}</span>
-              </div>
-              <div className="flex items-center gap-3 text-slate-600 text-sm">
-                <DbIcon className="h-4 w-4 text-[#00D1FF]" />
-                <span className="font-medium">{source.group}</span>
-              </div>
-            </CardContent>
-            <CardFooter className="pt-2 border-t border-slate-50 gap-4 flex bg-slate-50/30 px-6 py-4">
-              <Button 
-                variant="outline" 
-                className="flex-1 border-[#2672DB] text-[#2672DB] hover:bg-blue-50 font-bold h-10 shadow-sm"
-                onClick={() => toggleStatus(source.id)}
-              >
-                {source.status === "Active" ? "Deactivate" : "Review"}
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex-1 border-[#2672DB] text-[#2672DB] hover:bg-blue-50 font-bold h-10 shadow-sm"
-                onClick={() => handleOpenDialog(source)}
-              >
-                Edit
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+                  {source.status === "Active" ? "Deactivate" : "Review"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 border-[#2672DB] text-[#2672DB] hover:bg-blue-50 font-bold h-10 shadow-sm"
+                  onClick={() => handleOpenDialog(source)}
+                >
+                  Edit
+                </Button>
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-full py-20 text-center space-y-3">
+            <div className="flex justify-center">
+              <Search className="h-10 w-10 text-slate-200" />
+            </div>
+            <p className="text-slate-400 font-medium">No data sources found matching your criteria.</p>
+            <Button 
+              variant="link" 
+              onClick={() => { setStatusFilter("all"); setSearchTerm(""); }} 
+              className="text-[#2672DB]"
+            >
+              Clear all filters
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
