@@ -6,7 +6,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'ArchivaDash - Professional Data Archival',
+  title: 'MPM Archive - Professional Data Archival',
   description: 'Streamlined data archival and monitoring solution.',
 };
 

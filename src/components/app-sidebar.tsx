@@ -8,7 +8,8 @@ import {
   FileSpreadsheet, 
   Activity,
   CalendarDays,
-  ChevronRight
+  ChevronRight,
+  Archive
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -61,10 +62,10 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border/50 shadow-sm">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2 px-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-md">
-            AD
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md">
+            <Archive className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-primary font-headline">ArchivaDash</span>
+          <span className="text-xl font-bold tracking-tight text-primary font-headline">MPM Archive</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
