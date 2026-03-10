@@ -111,36 +111,6 @@ export default function RulesetTablesPage() {
             </Table>
           </CardContent>
         </Card>
-        
-        {/* Ruleset Info Sidebar/Area */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="bg-blue-50/50 border-blue-100 shadow-none">
-            <CardContent className="p-4 flex items-start gap-4">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Database className="h-5 w-5 text-primary" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-slate-900 text-sm">Ruleset Context</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {ruleset.description} All queries defined here will be executed under this ruleset's operational window.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-slate-50 border-slate-100 shadow-none">
-            <CardContent className="p-4 flex items-start gap-4">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Settings2 className="h-5 w-5 text-slate-400" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-slate-900 text-sm">Global Policies</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Individual table queries override global rules. Use the configuration button to define unique logic per table.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
