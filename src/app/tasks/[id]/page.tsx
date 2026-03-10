@@ -193,8 +193,8 @@ export default function TaskDetailPage() {
                   <p className="text-lg font-bold text-slate-800">0</p>
                 </div>
                 <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Throughput</p>
-                  <p className="text-lg font-bold text-slate-800">2,786 r/s</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Total Tables Archived</p>
+                  <p className="text-lg font-bold text-slate-800">12</p>
                 </div>
               </div>
             </CardContent>
