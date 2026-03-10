@@ -78,10 +78,10 @@ const ARCHIVE_STEPS = [
     badge: "bg-blue-100 text-blue-700"
   },
   { 
-    name: "Data Integrity Verification", 
+    name: "Database Space Reclamation", 
     duration: "0s", 
     status: "Pending", 
-    result: "Pending checksum verification",
+    result: "Pending database shrink",
     color: "text-slate-300",
     bgColor: "bg-slate-300",
     badge: "bg-slate-100 text-slate-500"
@@ -170,13 +170,13 @@ export default function TaskDetailPage() {
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
                   <CardTitle className="text-sm font-bold text-slate-500 uppercase tracking-wider">Current Progress: RUN-9821</CardTitle>
-                  <p className="text-xs text-slate-400">Status: Verifying Integrity</p>
+                  <p className="text-xs text-slate-400">Status: In Progress</p>
                 </div>
-                <div className="text-4xl font-black text-primary font-headline">100%</div>
+                <div className="text-4xl font-black text-primary font-headline">72%</div>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <Progress value={100} className="h-2.5 bg-slate-100 [&>div]:bg-primary" />
+              <Progress value={72} className="h-2.5 bg-slate-100 [&>div]:bg-primary" />
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-1">
