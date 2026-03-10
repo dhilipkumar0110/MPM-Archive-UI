@@ -62,7 +62,7 @@ export const ARCHIVAL_TASKS = [
     modifiedOn: "12-09-2025",
     startedOn: "12-09-2025 03:54:00",
     duration: "12h 30m",
-    status: "Paused",
+    status: "Archived",
     issues: 0,
     progress: 45,
     progressLabel: "Moving..."

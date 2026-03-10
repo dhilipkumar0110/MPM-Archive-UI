@@ -59,7 +59,6 @@ export default function DashboardPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "InProgress": return <Badge variant="secondary" className="bg-blue-50 text-blue-600 font-bold px-3 py-1">In Progress</Badge>;
-      case "Paused": return <Badge variant="secondary" className="bg-slate-200 text-slate-600 font-bold px-3 py-1">Paused</Badge>;
       case "Archived": return <Badge variant="secondary" className="bg-orange-50 text-orange-600 font-bold px-3 py-1">Archived</Badge>;
       case "Completed": return <Badge variant="secondary" className="bg-green-50 text-green-600 font-bold px-3 py-1">Completed</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
@@ -182,7 +181,6 @@ export default function DashboardPage() {
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="InProgress">In Progress</SelectItem>
-            <SelectItem value="Paused">Paused</SelectItem>
             <SelectItem value="Completed">Completed</SelectItem>
             <SelectItem value="Archived">Archived</SelectItem>
           </SelectContent>

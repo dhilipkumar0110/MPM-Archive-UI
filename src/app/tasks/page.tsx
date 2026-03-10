@@ -131,8 +131,6 @@ export default function TasksPage() {
     switch (status) {
       case "InProgress":
         return <Badge variant="secondary" className="bg-blue-100 text-blue-600 hover:bg-blue-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
-      case "Paused":
-        return <Badge variant="secondary" className="bg-slate-100 text-slate-500 hover:bg-slate-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
       case "Completed":
         return <Badge variant="secondary" className="bg-green-100 text-green-600 hover:bg-green-100 font-bold px-2 py-0.5 text-[10px] tracking-wider border-0">{statusUpper}</Badge>;
       case "New":
@@ -169,7 +167,7 @@ export default function TasksPage() {
                 <Input
                   id="name"
                   placeholder="e.g. Monthly Finance Scrub"
-                  value={newTaskName}
+                  newTaskName={newTaskName}
                   onChange={(e) => setNewTaskName(e.target.value)}
                 />
               </div>
