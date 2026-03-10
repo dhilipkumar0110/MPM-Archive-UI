@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -98,7 +99,7 @@ export default function WhereClauseBuilderPage() {
         </Button>
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Query Builder</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Table Rule Configuration</h1>
             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">{tableName}</Badge>
           </div>
           <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival in ruleset: {ruleset.name}.</p>
