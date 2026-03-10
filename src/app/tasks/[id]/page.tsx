@@ -16,7 +16,8 @@ import {
   Filter,
   ShieldCheck,
   Circle,
-  Table as TableIcon
+  Table as TableIcon,
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -130,9 +131,6 @@ export default function TaskDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="font-bold border-primary text-primary hover:bg-primary/5 shadow-sm">
-                <TableIcon className="h-4 w-4 mr-2" /> View Archived Tables
-              </Button>
               <Button className="bg-primary hover:bg-primary/90 font-bold px-6 shadow-sm">
                 <PlayCircle className="h-4 w-4 mr-2" /> Run Now
               </Button>
@@ -239,7 +237,7 @@ export default function TaskDetailPage() {
                               {expandedRun === run.id ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
                             </TableCell>
                             <TableCell className="font-bold text-primary text-xs tracking-tight py-4">{run.id}</TableCell>
-                            <TableCell className="text-slate-600 font-medium text-xs font-medium text-xs py-4">{run.date}</TableCell>
+                            <TableCell className="text-slate-600 font-medium text-xs py-4">{run.date}</TableCell>
                             <TableCell className="text-slate-600 font-medium text-xs py-4">{run.duration}</TableCell>
                             <TableCell className="py-4">
                               <Badge variant="outline" className={cn(
@@ -263,9 +261,16 @@ export default function TaskDetailPage() {
                                 <div className="flex flex-col lg:flex-row p-6 gap-8 bg-slate-50/40">
                                   {/* Step Execution Timeline */}
                                   <div className="flex-1 max-w-md">
-                                    <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                      Step Execution Timeline
-                                    </h3>
+                                    <div className="flex items-center justify-between mb-6">
+                                      <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                        Step Execution Timeline
+                                      </h3>
+                                      <Button asChild size="sm" variant="outline" className="h-8 border-primary text-primary hover:bg-primary/5 font-bold text-xs">
+                                        <Link href={`/tasks/${task.id}/runs/${run.id}/tables`}>
+                                          <TableIcon className="h-3.5 w-3.5 mr-1.5" /> View Archived Tables
+                                        </Link>
+                                      </Button>
+                                    </div>
                                     <div className="relative space-y-6">
                                       {ARCHIVE_STEPS.map((step, idx) => (
                                         <div key={idx} className="flex gap-4 relative">
