@@ -261,15 +261,19 @@ export default function TaskDetailPage() {
                                 <div className="flex flex-col lg:flex-row p-6 gap-8 bg-slate-50/40">
                                   {/* Step Execution Timeline */}
                                   <div className="flex-1 max-w-md">
-                                    <div className="flex items-center justify-between mb-6">
-                                      <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                    <div className="flex items-center justify-between mb-8">
+                                      <h3 className="text-sm font-bold text-slate-800">
                                         Step Execution Timeline
                                       </h3>
                                       <Link 
                                         href={`/tasks/${task.id}/runs/${run.id}/tables`}
-                                        className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1.5 uppercase tracking-wider"
+                                        className="text-primary hover:text-primary/80 flex items-center gap-2 group transition-all"
                                       >
-                                        <TableIcon className="h-3.5 w-3.5" /> View Archived Tables
+                                        <TableIcon className="h-4 w-4" />
+                                        <div className="flex flex-col text-[9px] font-black uppercase leading-[1.1] tracking-tighter">
+                                          <span>View Archived</span>
+                                          <span>Tables</span>
+                                        </div>
                                       </Link>
                                     </div>
                                     <div className="relative space-y-6">
