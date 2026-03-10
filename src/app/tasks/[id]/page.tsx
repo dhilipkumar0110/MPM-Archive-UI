@@ -258,7 +258,7 @@ export default function TaskDetailPage() {
                                     className="text-primary hover:text-primary/80 flex items-center gap-2 group transition-all"
                                   >
                                     <TableIcon className="h-4 w-4" />
-                                    <div className="flex flex-col text-[9px] font-black uppercase leading-[1.1] tracking-tighter">
+                                    <div className="flex flex-col text-[9px] font-black uppercase leading-[1.1] tracking-tighter text-right">
                                       <span>View Archived</span>
                                       <span>Tables</span>
                                     </div>
@@ -353,19 +353,6 @@ export default function TaskDetailPage() {
               </Card>
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
-
-      {/* Footer Branding Area */}
-      <div className="pt-10 mt-10 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-        <div className="flex items-center gap-4">
-          <span>© 2026 Archiv Data Systems</span>
-          <span className="flex items-center gap-1.5"><ShieldCheck className="h-3 w-3" /> System Secure</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <Link href="#" className="hover:text-primary">Documentation</Link>
-          <Link href="#" className="hover:text-primary">Support</Link>
-          <span className="text-slate-300">v2.4.0-stable</span>
         </div>
       </div>
     </div>
