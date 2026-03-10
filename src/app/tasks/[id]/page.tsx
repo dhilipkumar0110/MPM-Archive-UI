@@ -78,10 +78,10 @@ const ARCHIVE_STEPS = [
     badge: "bg-blue-100 text-blue-700"
   },
   { 
-    name: "Post-execution Cleanup", 
+    name: "Data Integrity Verification", 
     duration: "0s", 
     status: "Pending", 
-    result: "Pending",
+    result: "Pending checksum verification",
     color: "text-slate-300",
     bgColor: "bg-slate-300",
     badge: "bg-slate-100 text-slate-500"
@@ -170,7 +170,7 @@ export default function TaskDetailPage() {
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
                   <CardTitle className="text-sm font-bold text-slate-500 uppercase tracking-wider">Current Progress: RUN-9821</CardTitle>
-                  <p className="text-xs text-slate-400">Status: Finalizing Cleanup</p>
+                  <p className="text-xs text-slate-400">Status: Verifying Integrity</p>
                 </div>
                 <div className="text-4xl font-black text-primary font-headline">100%</div>
               </div>
