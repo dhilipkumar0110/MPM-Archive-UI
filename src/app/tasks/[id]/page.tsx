@@ -15,7 +15,8 @@ import {
   BarChart3,
   Filter,
   ShieldCheck,
-  Circle
+  Circle,
+  Table as TableIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -129,6 +130,9 @@ export default function TaskDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="outline" className="font-bold border-primary text-primary hover:bg-primary/5 shadow-sm">
+                <TableIcon className="h-4 w-4 mr-2" /> View Archived Tables
+              </Button>
               <Button className="bg-primary hover:bg-primary/90 font-bold px-6 shadow-sm">
                 <PlayCircle className="h-4 w-4 mr-2" /> Run Now
               </Button>
@@ -235,7 +239,7 @@ export default function TaskDetailPage() {
                               {expandedRun === run.id ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
                             </TableCell>
                             <TableCell className="font-bold text-primary text-xs tracking-tight py-4">{run.id}</TableCell>
-                            <TableCell className="text-slate-600 font-medium text-xs py-4">{run.date}</TableCell>
+                            <TableCell className="text-slate-600 font-medium text-xs font-medium text-xs py-4">{run.date}</TableCell>
                             <TableCell className="text-slate-600 font-medium text-xs py-4">{run.duration}</TableCell>
                             <TableCell className="py-4">
                               <Badge variant="outline" className={cn(
