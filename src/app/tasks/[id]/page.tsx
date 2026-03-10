@@ -14,7 +14,8 @@ import {
   Activity,
   BarChart3,
   Filter,
-  ShieldCheck
+  ShieldCheck,
+  Circle
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -44,10 +45,48 @@ import {
 import { 
   ARCHIVAL_TASKS, 
   TASK_HISTORY, 
-  LIFETIME_PERFORMANCE,
-  EXECUTION_LOGS 
+  LIFETIME_PERFORMANCE
 } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+
+const ARCHIVE_STEPS = [
+  { 
+    name: "Pre-validation", 
+    duration: "3s", 
+    status: "Completed", 
+    result: "No errors and warnings",
+    color: "text-green-500",
+    bgColor: "bg-green-500",
+    badge: "bg-green-100 text-green-700"
+  },
+  { 
+    name: "Archive Plan Construction", 
+    duration: "9s", 
+    status: "Completed", 
+    result: "No errors and warnings",
+    color: "text-green-500",
+    bgColor: "bg-green-500",
+    badge: "bg-green-100 text-green-700"
+  },
+  { 
+    name: "Archive Plan Execution", 
+    duration: "9m 10s", 
+    status: "InProgress", 
+    result: "Archiving in progress...",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500",
+    badge: "bg-blue-100 text-blue-700"
+  },
+  { 
+    name: "Post-execution Cleanup", 
+    duration: "0s", 
+    status: "Pending", 
+    result: "Pending",
+    color: "text-slate-300",
+    bgColor: "bg-slate-300",
+    badge: "bg-slate-100 text-slate-500"
+  },
+];
 
 export default function TaskDetailPage() {
   const { id } = useParams();
@@ -215,22 +254,86 @@ export default function TaskDetailPage() {
                           </TableRow>
                           
                           {expandedRun === run.id && (
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                            <TableRow className="bg-white border-t border-slate-100">
                               <TableCell colSpan={7} className="p-0">
-                                <div className="p-6 space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                      <Activity className="h-3 w-3" /> Execution Log Snippet
+                                <div className="flex flex-col lg:flex-row p-6 gap-8 bg-slate-50/40">
+                                  {/* Step Execution Timeline */}
+                                  <div className="flex-1 max-w-md">
+                                    <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                      Step Execution Timeline
+                                    </h3>
+                                    <div className="relative space-y-6">
+                                      {ARCHIVE_STEPS.map((step, idx) => (
+                                        <div key={idx} className="flex gap-4 relative">
+                                          {/* Connector line */}
+                                          {idx < ARCHIVE_STEPS.length - 1 && (
+                                            <div className={cn(
+                                              "absolute left-3.5 top-8 w-0.5 h-10",
+                                              step.status === 'Completed' ? "bg-green-400" : "bg-slate-200"
+                                            )} />
+                                          )}
+                                          
+                                          <div className="z-10 bg-white rounded-full p-0.5 mt-0.5">
+                                            {step.status === 'Completed' ? (
+                                              <CheckCircle2 className="h-6 w-6 text-green-500" />
+                                            ) : step.status === 'InProgress' ? (
+                                              <div className="h-6 w-6 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+                                            ) : (
+                                              <Circle className="h-6 w-6 text-slate-200" />
+                                            )}
+                                          </div>
+                                          
+                                          <div className="flex-1">
+                                            <div className="flex items-center gap-2">
+                                              <span className={cn("text-sm font-bold", step.status === 'Pending' ? "text-slate-400" : "text-slate-800")}>
+                                                {step.name}
+                                              </span>
+                                              <Badge className={cn("text-[8px] px-1.5 h-4 font-bold border-0 uppercase tracking-tighter", step.badge)}>
+                                                {step.status}
+                                              </Badge>
+                                            </div>
+                                            <p className="text-xs text-slate-500 mt-0.5">Duration: {step.duration}</p>
+                                          </div>
+                                        </div>
+                                      ))}
                                     </div>
-                                    <Button variant="link" size="sm" className="text-primary font-bold text-xs p-0 h-auto">View Full Log</Button>
                                   </div>
-                                  <div className="bg-white border border-slate-200 rounded-lg p-5 font-mono text-xs text-slate-600 space-y-2.5 shadow-sm">
-                                    {EXECUTION_LOGS.map((log, i) => (
-                                      <div key={i} className="flex gap-3">
-                                        <span className="text-slate-300 w-6">[{i + 1}]</span>
-                                        <span>{log}</span>
-                                      </div>
-                                    ))}
+
+                                  {/* Detailed Step Table */}
+                                  <div className="flex-[2]">
+                                    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                      <Table>
+                                        <TableHeader className="bg-slate-50">
+                                          <TableRow className="hover:bg-transparent">
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider py-3">Step Name</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider py-3">Elapsed Time</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider py-3">Status</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider py-3">Results</TableHead>
+                                          </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                          {ARCHIVE_STEPS.map((step, idx) => (
+                                            <TableRow key={idx} className="hover:bg-transparent border-slate-100 last:border-0">
+                                              <TableCell className="text-xs font-bold text-slate-700 py-4">{step.name}</TableCell>
+                                              <TableCell className="text-xs font-medium text-slate-600 py-4">{step.duration}</TableCell>
+                                              <TableCell className="text-xs font-medium text-slate-600 py-4">{step.status}</TableCell>
+                                              <TableCell className="py-4">
+                                                <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                                                  {step.status === 'Completed' ? (
+                                                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                                                  ) : step.status === 'InProgress' ? (
+                                                    <div className="h-3.5 w-3.5 rounded-full border border-blue-500 border-t-transparent animate-spin" />
+                                                  ) : (
+                                                    <Clock className="h-3.5 w-3.5 text-slate-300" />
+                                                  )}
+                                                  {step.result}
+                                                </div>
+                                              </TableCell>
+                                            </TableRow>
+                                          ))}
+                                        </TableBody>
+                                      </Table>
+                                    </div>
                                   </div>
                                 </div>
                               </TableCell>
