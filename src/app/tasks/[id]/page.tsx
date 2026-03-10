@@ -265,11 +265,12 @@ export default function TaskDetailPage() {
                                       <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                                         Step Execution Timeline
                                       </h3>
-                                      <Button asChild size="sm" variant="outline" className="h-8 border-primary text-primary hover:bg-primary/5 font-bold text-xs">
-                                        <Link href={`/tasks/${task.id}/runs/${run.id}/tables`}>
-                                          <TableIcon className="h-3.5 w-3.5 mr-1.5" /> View Archived Tables
-                                        </Link>
-                                      </Button>
+                                      <Link 
+                                        href={`/tasks/${task.id}/runs/${run.id}/tables`}
+                                        className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1.5 uppercase tracking-wider"
+                                      >
+                                        <TableIcon className="h-3.5 w-3.5" /> View Archived Tables
+                                      </Link>
                                     </div>
                                     <div className="relative space-y-6">
                                       {ARCHIVE_STEPS.map((step, idx) => (
