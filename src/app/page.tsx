@@ -169,7 +169,7 @@ export default function DashboardPage() {
             <CardDescription className="text-xs">Aggregate index, query, and deadlock analysis.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col items-center justify-center py-6">
-            <ChartContainer config={healthChartConfig} className="h-[240px] w-full">
+            <ChartContainer config={healthChartConfig} className="aspect-auto h-[240px] w-full">
               <PieChart>
                 <Pie
                   data={HEALTH_DISTRIBUTION}
@@ -233,11 +233,11 @@ export default function DashboardPage() {
               View Details <ArrowUpRight className="ml-1 h-3 w-3" />
             </Button>
           </CardHeader>
-          <CardContent className="h-[300px]">
-            <ChartContainer config={trendChartConfig}>
+          <CardContent className="h-[300px] pb-12">
+            <ChartContainer config={trendChartConfig} className="aspect-auto h-full w-full">
               <AreaChart 
                 data={ARCHIVE_TREND_DATA}
-                margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
@@ -251,7 +251,6 @@ export default function DashboardPage() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
-                  dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
