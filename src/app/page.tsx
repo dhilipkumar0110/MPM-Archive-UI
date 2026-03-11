@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -67,6 +66,13 @@ const healthChartConfig = {
   Critical: {
     label: "Critical",
     color: "hsl(var(--destructive))",
+  },
+} satisfies ChartConfig;
+
+const trendChartConfig = {
+  volume: {
+    label: "Volume (GB)",
+    color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig;
 
@@ -228,8 +234,11 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ChartContainer config={{ volume: { label: "Volume (GB)", color: "hsl(var(--primary))" } }}>
-              <AreaChart data={ARCHIVE_TREND_DATA}>
+            <ChartContainer config={trendChartConfig}>
+              <AreaChart 
+                data={ARCHIVE_TREND_DATA}
+                margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
+              >
                 <defs>
                   <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
@@ -241,7 +250,8 @@ export default function DashboardPage() {
                   dataKey="month" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
+                  dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
