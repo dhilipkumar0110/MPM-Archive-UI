@@ -7,7 +7,10 @@ import {
   Settings2, 
   Table as TableIcon,
   Search,
-  Download
+  Download,
+  AlertTriangle,
+  Activity,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -68,7 +71,7 @@ export default function SourceTablesPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base font-bold font-headline">Tables in Source</CardTitle>
-                <CardDescription>Click a table to view performance metrics or configure archival rules.</CardDescription>
+                <CardDescription>Review performance metrics and configure archival rules.</CardDescription>
               </div>
               <div className="relative w-64">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -80,15 +83,16 @@ export default function SourceTablesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[400px] font-bold py-4 px-6 text-slate-600">Table Name</TableHead>
-                  <TableHead className="font-bold py-4 text-slate-600">Schema</TableHead>
+                  <TableHead className="w-[300px] font-bold py-4 px-6 text-slate-600">Table Name</TableHead>
+                  <TableHead className="font-bold py-4 text-slate-600">Missing Indexes</TableHead>
+                  <TableHead className="font-bold py-4 text-slate-600">Deadlocks</TableHead>
+                  <TableHead className="font-bold py-4 text-slate-600">Slow Queries</TableHead>
                   <TableHead className="font-bold py-4 text-slate-600">Table Size</TableHead>
-                  <TableHead className="font-bold py-4 text-slate-600">Last Modified</TableHead>
                   <TableHead className="font-bold py-4 text-slate-600 text-right pr-6">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {policy.tables.map((tableName) => (
+                {policy.tables.map((tableName, idx) => (
                   <TableRow key={tableName} className="hover:bg-slate-50/30 group">
                     <TableCell className="px-6 py-4">
                       <Link href={`/rulesets/${policy.id}/tables/${tableName}`} className="flex items-center gap-3 hover:opacity-80 transition-all">
@@ -102,16 +106,33 @@ export default function SourceTablesPage() {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="font-bold text-[10px] bg-white">dbo</Badge>
+                      <div className="flex items-center gap-1.5">
+                        {idx % 2 === 0 ? (
+                          <Badge variant="secondary" className="bg-red-50 text-red-600 border-red-100 font-bold text-[10px] px-2">
+                            <AlertTriangle className="h-3 w-3 mr-1" /> 2 Issues
+                          </Badge>
+                        ) : (
+                          <span className="text-slate-300 font-medium text-xs">—</span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs font-bold text-slate-600">245.8 GB</span>
+                      <div className="flex items-center gap-1.5 text-slate-600 font-bold text-xs">
+                        <Activity className="h-3.5 w-3.5 text-slate-400" />
+                        {idx * 3 + 2}
+                      </div>
                     </TableCell>
-                    <TableCell className="text-slate-500 text-xs font-medium">
-                      Oct 24, 2024
+                    <TableCell>
+                      <div className="flex items-center gap-1.5 text-orange-600 font-bold text-xs">
+                        <Zap className="h-3.5 w-3.5 text-orange-400" />
+                        {idx * 12 + 5}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs font-bold text-slate-600">{idx === 0 ? "245.8 GB" : idx === 1 ? "18.2 GB" : "112.5 GB"}</span>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <Button asChild size="sm" className="bg-primary hover:bg-primary/90 font-bold h-9">
+                      <Button asChild size="sm" className="bg-primary hover:bg-primary/90 font-bold h-9 shadow-sm">
                         <Link href={`/rulesets/${policy.id}/configure?table=${tableName}`}>
                           <Settings2 className="h-4 w-4 mr-2" /> Configure Query
                         </Link>
