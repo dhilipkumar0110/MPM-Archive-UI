@@ -39,7 +39,7 @@ const items = [
     icon: Database,
   },
   {
-    title: "Rulesets",
+    title: "Archival Policies",
     url: "/rulesets",
     icon: FileSpreadsheet,
   },

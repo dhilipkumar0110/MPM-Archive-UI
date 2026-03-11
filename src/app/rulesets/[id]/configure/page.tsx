@@ -39,7 +39,7 @@ type Condition = {
   join: "AND" | "OR";
 };
 
-export default function WhereClauseBuilderPage() {
+export default function TableRuleBuilderPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function WhereClauseBuilderPage() {
   const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : null;
   const tableName = searchParams.get('table') || 'table_name';
 
-  const ruleset = useMemo(() => {
+  const policy = useMemo(() => {
     if (!id) return RULESETS[0];
     return RULESETS.find(r => r.id === id) || RULESETS[0];
   }, [id]);
@@ -86,7 +86,7 @@ export default function WhereClauseBuilderPage() {
     router.push(`/rulesets/${id}`);
   };
 
-  if (!ruleset) return <div className="p-8 text-center">Loading ruleset...</div>;
+  if (!policy) return <div className="p-8 text-center">Loading archival policy...</div>;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
@@ -102,7 +102,7 @@ export default function WhereClauseBuilderPage() {
             <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Table Rule Configuration</h1>
             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">{tableName}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival in ruleset: {ruleset.name}.</p>
+          <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival in policy: {policy.name}.</p>
         </div>
       </div>
 
@@ -123,18 +123,9 @@ export default function WhereClauseBuilderPage() {
                 <div key={cond.id} className="flex flex-wrap items-center gap-3 p-4 bg-muted/20 rounded-xl border border-border/40 relative group">
                   {index > 0 && (
                     <div className="absolute -top-3 left-6 z-10">
-                      <Select 
-                        value={cond.join} 
-                        onValueChange={(val: "AND"|"OR") => updateCondition(cond.id, { join: val })}
-                      >
-                        <SelectTrigger className="h-6 text-[10px] w-16 bg-primary text-primary-foreground font-bold uppercase rounded-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="AND">AND</SelectItem>
-                          <SelectItem value="OR">OR</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <span className="px-3 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold uppercase rounded-full shadow-sm">
+                        {cond.join}
+                      </span>
                     </div>
                   )}
 

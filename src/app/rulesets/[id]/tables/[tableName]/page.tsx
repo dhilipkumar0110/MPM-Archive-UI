@@ -12,7 +12,8 @@ import {
   Database,
   Search,
   Settings2,
-  Info
+  Info,
+  BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -43,8 +44,7 @@ import {
   AreaChart, 
   CartesianGrid, 
   XAxis, 
-  YAxis,
-  ResponsiveContainer 
+  YAxis
 } from "recharts";
 import { RULESETS } from "@/lib/mock-data";
 
@@ -64,7 +64,7 @@ export default function TableAnalyticsPage() {
   const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : null;
   const tableName = typeof params?.tableName === 'string' ? params.tableName : Array.isArray(params?.tableName) ? params.tableName[0] : 'table_name';
 
-  const ruleset = useMemo(() => {
+  const policy = useMemo(() => {
     if (!id) return RULESETS[0];
     return RULESETS.find(r => r.id === id) || RULESETS[0];
   }, [id]);
@@ -79,9 +79,9 @@ export default function TableAnalyticsPage() {
       {/* Breadcrumbs & Header */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-xs text-slate-400 font-bold uppercase tracking-widest">
-          <Link href="/rulesets" className="hover:text-primary">Rulesets</Link>
+          <Link href="/rulesets" className="hover:text-primary">Archival Policies</Link>
           <span>/</span>
-          <Link href={`/rulesets/${id}`} className="hover:text-primary">{ruleset.name}</Link>
+          <Link href={`/rulesets/${id}`} className="hover:text-primary">{policy.name}</Link>
           <span>/</span>
           <span className="text-slate-600">{tableName}</span>
         </div>
@@ -270,5 +270,3 @@ export default function TableAnalyticsPage() {
     </div>
   );
 }
-
-import { BarChart3 } from "lucide-react";

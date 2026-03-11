@@ -35,11 +35,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export default function RulesetsPage() {
-  const [localRulesets, setLocalRulesets] = useState(RULESETS);
+export default function ArchivalPoliciesPage() {
+  const [localPolicies, setLocalPolicies] = useState(RULESETS);
   const [isUploading, setIsUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
-  const [newRulesetName, setNewRulesetName] = useState("");
+  const [newPolicyName, setNewPolicyName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleUpload = () => {
@@ -50,17 +50,17 @@ export default function RulesetsPage() {
       setUploaded(true);
       toast({
         title: "Excel Uploaded Successfully",
-        description: "Found table definitions in the uploaded file",
+        description: "Found table definitions in the uploaded policy file",
       });
     }, 1500);
   };
 
-  const handleSaveRuleset = () => {
-    if (!newRulesetName.trim()) {
+  const handleSavePolicy = () => {
+    if (!newPolicyName.trim()) {
       toast({
         variant: "destructive",
         title: "Name Required",
-        description: "Please enter a name for the archive ruleset.",
+        description: "Please enter a name for the archival policy.",
       });
       return;
     }
@@ -69,34 +69,34 @@ export default function RulesetsPage() {
       toast({
         variant: "destructive",
         title: "Excel File Required",
-        description: "Please upload an archive ruleset definition file.",
+        description: "Please upload an archival policy definition file.",
       });
       return;
     }
 
-    const newRuleset = {
+    const newPolicy = {
       id: `rs-${Date.now()}`,
-      name: newRulesetName,
+      name: newPolicyName,
       tables: ["imported_table_1", "imported_table_2"],
-      description: `New ruleset imported from Excel for ${newRulesetName}.`
+      description: `New archival policy imported from Excel for ${newPolicyName}.`
     };
 
-    setLocalRulesets([newRuleset, ...localRulesets]);
-    setNewRulesetName("");
+    setLocalPolicies([newPolicy, ...localPolicies]);
+    setNewPolicyName("");
     setUploaded(false);
     setIsDialogOpen(false);
     
     toast({
-      title: "Ruleset Added",
-      description: `"${newRulesetName}" has been successfully added to your active rulesets.`,
+      title: "Policy Added",
+      description: `"${newPolicyName}" has been successfully added to your active policies.`,
     });
   };
 
-  const deleteRuleset = (id: string) => {
-    setLocalRulesets(localRulesets.filter(r => r.id !== id));
+  const deletePolicy = (id: string) => {
+    setLocalPolicies(localPolicies.filter(r => r.id !== id));
     toast({
-      title: "Ruleset Removed",
-      description: "The ruleset has been deleted from the active list.",
+      title: "Policy Removed",
+      description: "The archival policy has been deleted from the active list.",
     });
   };
 
@@ -104,31 +104,31 @@ export default function RulesetsPage() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">Archive Rulesets</h1>
-          <p className="text-muted-foreground">Define and manage rule sets for automated data archival processes.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">Archival Policies</h1>
+          <p className="text-muted-foreground">Define and manage data governance policies for automated archival processes.</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90 shadow-md">
-              <Plus className="h-4 w-4 mr-2" /> New Ruleset
+              <Plus className="h-4 w-4 mr-2" /> New Policy
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] border-slate-200">
             <DialogHeader>
-              <DialogTitle className="font-headline text-xl text-slate-900">Create New Ruleset</DialogTitle>
+              <DialogTitle className="font-headline text-xl text-slate-900">Create New Archival Policy</DialogTitle>
               <DialogDescription>
                 Provide a name and upload your Excel definition file to get started.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="name" className="text-sm font-bold text-slate-700">Archive Ruleset Name</Label>
+                <Label htmlFor="name" className="text-sm font-bold text-slate-700">Archival Policy Name</Label>
                 <Input
                   id="name"
                   placeholder="e.g. Q4 Financial Cleanup"
-                  value={newRulesetName}
-                  onChange={(e) => setNewRulesetName(e.target.value)}
+                  value={newPolicyName}
+                  onChange={(e) => setNewPolicyName(e.target.value)}
                   className="bg-slate-50 border-slate-200 focus:bg-white transition-colors"
                 />
               </div>
@@ -148,10 +148,10 @@ export default function RulesetsPage() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-base font-bold font-headline text-slate-900">
-                      {uploaded ? "Excel Uploaded Successfully" : "Upload Archive Ruleset (Excel)"}
+                      {uploaded ? "Excel Uploaded Successfully" : "Upload Archival Policy (Excel)"}
                     </h3>
                     <p className="text-sm text-slate-500 max-w-[300px] mx-auto leading-relaxed">
-                      {uploaded ? "archival_v2_export.xlsx (12.4 KB)" : "Drag and drop your Excel sheet here or click to browse files"}
+                      {uploaded ? "policy_v2_export.xlsx (12.4 KB)" : "Drag and drop your Excel sheet here or click to browse files"}
                     </p>
                   </div>
                   {!uploaded ? (
@@ -185,26 +185,26 @@ export default function RulesetsPage() {
                 Cancel
               </Button>
               <Button 
-                onClick={handleSaveRuleset} 
+                onClick={handleSavePolicy} 
                 className="bg-primary hover:bg-primary/90 font-bold px-10 shadow-lg shadow-primary/20"
               >
-                Save Ruleset
+                Save Policy
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Existing Rulesets */}
+      {/* Existing Policies */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold font-headline text-slate-900">Active Rulesets</h2>
+          <h2 className="text-xl font-bold font-headline text-slate-900">Active Policies</h2>
           <Badge variant="outline" className="font-bold bg-white text-slate-600 border-slate-200">
-            {localRulesets.length} Active
+            {localPolicies.length} Active
           </Badge>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {localRulesets.map((rs) => (
+          {localPolicies.map((rs) => (
             <Card key={rs.id} className="shadow-sm border-slate-200 flex flex-col hover:border-primary/40 transition-all bg-white group">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
@@ -222,7 +222,7 @@ export default function RulesetsPage() {
               </CardHeader>
               <CardContent className="flex-1 mt-4">
                 <div className="space-y-3">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Involved Tables</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Governed Tables</p>
                   <div className="flex flex-wrap gap-1.5">
                     {rs.tables.map(table => (
                       <Badge key={table} variant="secondary" className="text-[10px] py-0.5 px-2.5 font-bold bg-slate-100 text-slate-600 border-0">
@@ -242,7 +242,7 @@ export default function RulesetsPage() {
                   variant="outline" 
                   size="icon" 
                   className="h-10 w-10 text-slate-400 hover:text-red-500 hover:bg-red-50 border-slate-200 hover:border-red-200 transition-colors"
-                  onClick={() => deleteRuleset(rs.id)}
+                  onClick={() => deletePolicy(rs.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

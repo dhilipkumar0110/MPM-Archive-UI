@@ -31,16 +31,16 @@ import {
 } from "@/components/ui/table";
 import { RULESETS } from "@/lib/mock-data";
 
-export default function RulesetTablesPage() {
+export default function PolicyTablesPage() {
   const params = useParams();
   const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : null;
 
-  const ruleset = useMemo(() => {
+  const policy = useMemo(() => {
     if (!id) return null;
     return RULESETS.find(r => r.id === id);
   }, [id]);
 
-  if (!ruleset) return <div className="p-8 text-center text-slate-500">Ruleset not found.</div>;
+  if (!policy) return <div className="p-8 text-center text-slate-500">Archival Policy not found.</div>;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
@@ -53,8 +53,8 @@ export default function RulesetTablesPage() {
             </Link>
           </Button>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Ruleset Tables: {ruleset.name}</h1>
-            <p className="text-sm text-muted-foreground">Monitor table health and configure specific archival rules.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Policy Tables: {policy.name}</h1>
+            <p className="text-sm text-muted-foreground">Monitor table health and configure specific archival rules for this policy.</p>
           </div>
         </div>
         <Button variant="outline" size="sm" className="font-bold">
@@ -67,7 +67,7 @@ export default function RulesetTablesPage() {
           <CardHeader className="bg-slate-50/50 border-b">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base font-bold font-headline">Tables in Ruleset</CardTitle>
+                <CardTitle className="text-base font-bold font-headline">Tables in Policy</CardTitle>
                 <CardDescription>Click a table to view performance metrics or configure archival rules.</CardDescription>
               </div>
               <div className="relative w-64">
@@ -88,10 +88,10 @@ export default function RulesetTablesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {ruleset.tables.map((tableName) => (
+                {policy.tables.map((tableName) => (
                   <TableRow key={tableName} className="hover:bg-slate-50/30 group">
                     <TableCell className="px-6 py-4">
-                      <Link href={`/rulesets/${ruleset.id}/tables/${tableName}`} className="flex items-center gap-3 hover:opacity-80 transition-all">
+                      <Link href={`/rulesets/${policy.id}/tables/${tableName}`} className="flex items-center gap-3 hover:opacity-80 transition-all">
                         <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
                           <TableIcon className="h-4 w-4 text-primary" />
                         </div>
@@ -112,7 +112,7 @@ export default function RulesetTablesPage() {
                     </TableCell>
                     <TableCell className="text-right pr-6">
                       <Button asChild size="sm" className="bg-primary hover:bg-primary/90 font-bold h-9">
-                        <Link href={`/rulesets/${ruleset.id}/configure?table=${tableName}`}>
+                        <Link href={`/rulesets/${policy.id}/configure?table=${tableName}`}>
                           <Settings2 className="h-4 w-4 mr-2" /> Configure Query
                         </Link>
                       </Button>

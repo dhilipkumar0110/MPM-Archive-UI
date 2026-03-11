@@ -57,7 +57,7 @@ export default function TasksPage() {
 
   // Form State
   const [newTaskName, setNewTaskName] = useState("");
-  const [selectedRuleSet, setSelectedRuleSet] = useState("");
+  const [selectedPolicy, setSelectedPolicy] = useState("");
   const [sourceDb, setSourceDb] = useState("");
   const [targetDb, setTargetDb] = useState("");
 
@@ -71,11 +71,11 @@ export default function TasksPage() {
   }, [tasks, activeTab, searchTerm]);
 
   const handleCreateTask = () => {
-    if (!newTaskName || !selectedRuleSet || !sourceDb || !targetDb) {
+    if (!newTaskName || !selectedPolicy || !sourceDb || !targetDb) {
       toast({
         variant: "destructive",
         title: "Missing Fields",
-        description: "Please fill in all fields to create a task.",
+        description: "Please fill in all fields to create an archive task.",
       });
       return;
     }
@@ -83,7 +83,7 @@ export default function TasksPage() {
     const newTask = {
       id: `TSK-${Date.now()}`,
       name: newTaskName,
-      ruleSet: selectedRuleSet,
+      ruleSet: selectedPolicy,
       sourceDb: sourceDb,
       targetDb: targetDb,
       status: "New",
@@ -91,7 +91,7 @@ export default function TasksPage() {
       startedOn: "Pending...",
       progress: 0,
       issues: 0,
-      dataSource: `${sourceDb}.${selectedRuleSet}`,
+      dataSource: `${sourceDb}.${selectedPolicy}`,
       schedule: "Manual",
       lastRunStart: "N/A",
       lastRunEnd: "N/A",
@@ -102,7 +102,7 @@ export default function TasksPage() {
     setTasks([newTask as any, ...tasks]);
     setIsDialogOpen(false);
     setNewTaskName("");
-    setSelectedRuleSet("");
+    setSelectedPolicy("");
     setSourceDb("");
     setTargetDb("");
 
@@ -167,15 +167,15 @@ export default function TasksPage() {
                 <Input
                   id="name"
                   placeholder="e.g. Monthly Finance Scrub"
-                  newTaskName={newTaskName}
+                  value={newTaskName}
                   onChange={(e) => setNewTaskName(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
-                <Label className="text-sm font-bold text-slate-700">Rule Set</Label>
-                <Select value={selectedRuleSet} onValueChange={setSelectedRuleSet}>
+                <Label className="text-sm font-bold text-slate-700">Archival Policy</Label>
+                <Select value={selectedPolicy} onValueChange={setSelectedPolicy}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a ruleset" />
+                    <SelectValue placeholder="Select an archival policy" />
                   </SelectTrigger>
                   <SelectContent>
                     {RULESETS.map(rs => (
@@ -291,7 +291,7 @@ export default function TasksPage() {
               <CardContent className="flex-1 space-y-3 pb-4">
                 <div className="flex items-center gap-3 text-slate-500">
                   <FileText className="h-4 w-4 text-[#00D1FF]" />
-                  <span className="text-xs font-medium">{task.ruleSet || "Data consistency rule set"}</span>
+                  <span className="text-xs font-medium">{task.ruleSet || "Policy-driven archival"}</span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-500">
                   <Database className="h-4 w-4 text-[#00D1FF]" />
