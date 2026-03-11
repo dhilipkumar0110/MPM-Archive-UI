@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { 
   Database, 
   ShieldCheck, 
@@ -24,6 +24,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from "@/components/ui/chart";
 import { 
   Area, 
@@ -31,7 +32,6 @@ import {
   CartesianGrid, 
   XAxis, 
   YAxis,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
@@ -54,6 +54,21 @@ const HEALTH_DISTRIBUTION = [
   { name: "Warning", value: 12, color: "hsl(var(--chart-4))" },
   { name: "Critical", value: 6, color: "hsl(var(--destructive))" },
 ];
+
+const healthChartConfig = {
+  Healthy: {
+    label: "Healthy",
+    color: "hsl(var(--primary))",
+  },
+  Warning: {
+    label: "Warning",
+    color: "hsl(var(--chart-4))",
+  },
+  Critical: {
+    label: "Critical",
+    color: "hsl(var(--destructive))",
+  },
+} satisfies ChartConfig;
 
 export default function DashboardPage() {
   const healthScore = 88;
@@ -148,31 +163,46 @@ export default function DashboardPage() {
             <CardDescription className="text-xs">Aggregate index, query, and deadlock analysis.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col items-center justify-center py-6">
-            <div className="h-[240px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={HEALTH_DISTRIBUTION}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {HEALTH_DISTRIBUTION.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                    ))}
-                    <RechartsLabel
-                      value={`${healthScore}%`}
-                      position="center"
-                      className="fill-slate-900 text-4xl font-black font-headline"
-                    />
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartContainer config={healthChartConfig} className="h-[240px] w-full">
+              <PieChart>
+                <Pie
+                  data={HEALTH_DISTRIBUTION}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {HEALTH_DISTRIBUTION.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                  ))}
+                  <RechartsLabel
+                    content={({ viewBox }) => {
+                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                        return (
+                          <text
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                          >
+                            <tspan
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              className="fill-slate-900 text-4xl font-black font-headline"
+                            >
+                              {healthScore}%
+                            </tspan>
+                          </text>
+                        )
+                      }
+                    }}
+                  />
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              </PieChart>
+            </ChartContainer>
             <div className="grid grid-cols-3 gap-4 w-full mt-2">
               {HEALTH_DISTRIBUTION.map((item) => (
                 <div key={item.name} className="flex flex-col items-center">
