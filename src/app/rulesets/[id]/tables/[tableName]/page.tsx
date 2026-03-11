@@ -79,7 +79,7 @@ export default function TableAnalyticsPage() {
       {/* Breadcrumbs & Header */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-xs text-slate-400 font-bold uppercase tracking-widest">
-          <Link href="/rulesets" className="hover:text-primary">Archival Policies</Link>
+          <Link href="/rulesets" className="hover:text-primary">Archive Sources</Link>
           <span>/</span>
           <Link href={`/rulesets/${id}`} className="hover:text-primary">{policy.name}</Link>
           <span>/</span>

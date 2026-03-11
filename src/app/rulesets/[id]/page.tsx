@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/table";
 import { RULESETS } from "@/lib/mock-data";
 
-export default function PolicyTablesPage() {
+export default function SourceTablesPage() {
   const params = useParams();
   const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : null;
 
@@ -40,7 +40,7 @@ export default function PolicyTablesPage() {
     return RULESETS.find(r => r.id === id);
   }, [id]);
 
-  if (!policy) return <div className="p-8 text-center text-slate-500">Archival Policy not found.</div>;
+  if (!policy) return <div className="p-8 text-center text-slate-500">Archive Source not found.</div>;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
@@ -53,8 +53,8 @@ export default function PolicyTablesPage() {
             </Link>
           </Button>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Policy Tables: {policy.name}</h1>
-            <p className="text-sm text-muted-foreground">Monitor table health and configure specific archival rules for this policy.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Source Tables: {policy.name}</h1>
+            <p className="text-sm text-muted-foreground">Monitor table health and configure specific archival rules for this source.</p>
           </div>
         </div>
         <Button variant="outline" size="sm" className="font-bold">
@@ -67,7 +67,7 @@ export default function PolicyTablesPage() {
           <CardHeader className="bg-slate-50/50 border-b">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base font-bold font-headline">Tables in Policy</CardTitle>
+                <CardTitle className="text-base font-bold font-headline">Tables in Source</CardTitle>
                 <CardDescription>Click a table to view performance metrics or configure archival rules.</CardDescription>
               </div>
               <div className="relative w-64">

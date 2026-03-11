@@ -172,10 +172,10 @@ export default function TasksPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label className="text-sm font-bold text-slate-700">Archival Policy</Label>
+                <Label className="text-sm font-bold text-slate-700">Archive Source</Label>
                 <Select value={selectedPolicy} onValueChange={setSelectedPolicy}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an archival policy" />
+                    <SelectValue placeholder="Select an archive source" />
                   </SelectTrigger>
                   <SelectContent>
                     {RULESETS.map(rs => (
@@ -291,7 +291,7 @@ export default function TasksPage() {
               <CardContent className="flex-1 space-y-3 pb-4">
                 <div className="flex items-center gap-3 text-slate-500">
                   <FileText className="h-4 w-4 text-[#00D1FF]" />
-                  <span className="text-xs font-medium">{task.ruleSet || "Policy-driven archival"}</span>
+                  <span className="text-xs font-medium">{task.ruleSet || "Source-driven archival"}</span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-500">
                   <Database className="h-4 w-4 text-[#00D1FF]" />

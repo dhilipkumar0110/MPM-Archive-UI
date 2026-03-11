@@ -35,7 +35,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export default function ArchivalPoliciesPage() {
+export default function ArchiveSourcesPage() {
   const [localPolicies, setLocalPolicies] = useState(RULESETS);
   const [isUploading, setIsUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
@@ -50,7 +50,7 @@ export default function ArchivalPoliciesPage() {
       setUploaded(true);
       toast({
         title: "Excel Uploaded Successfully",
-        description: "Found table definitions in the uploaded policy file",
+        description: "Found table definitions in the uploaded source file",
       });
     }, 1500);
   };
@@ -60,7 +60,7 @@ export default function ArchivalPoliciesPage() {
       toast({
         variant: "destructive",
         title: "Name Required",
-        description: "Please enter a name for the archival policy.",
+        description: "Please enter a name for the archive source.",
       });
       return;
     }
@@ -69,7 +69,7 @@ export default function ArchivalPoliciesPage() {
       toast({
         variant: "destructive",
         title: "Excel File Required",
-        description: "Please upload an archival policy definition file.",
+        description: "Please upload an archive source definition file.",
       });
       return;
     }
@@ -78,7 +78,7 @@ export default function ArchivalPoliciesPage() {
       id: `rs-${Date.now()}`,
       name: newPolicyName,
       tables: ["imported_table_1", "imported_table_2"],
-      description: `New archival policy imported from Excel for ${newPolicyName}.`
+      description: `New archive source imported from Excel for ${newPolicyName}.`
     };
 
     setLocalPolicies([newPolicy, ...localPolicies]);
@@ -87,16 +87,16 @@ export default function ArchivalPoliciesPage() {
     setIsDialogOpen(false);
     
     toast({
-      title: "Policy Added",
-      description: `"${newPolicyName}" has been successfully added to your active policies.`,
+      title: "Source Added",
+      description: `"${newPolicyName}" has been successfully added to your active sources.`,
     });
   };
 
   const deletePolicy = (id: string) => {
     setLocalPolicies(localPolicies.filter(r => r.id !== id));
     toast({
-      title: "Policy Removed",
-      description: "The archival policy has been deleted from the active list.",
+      title: "Source Removed",
+      description: "The archive source has been deleted from the active list.",
     });
   };
 
@@ -104,26 +104,26 @@ export default function ArchivalPoliciesPage() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">Archival Policies</h1>
-          <p className="text-muted-foreground">Define and manage data governance policies for automated archival processes.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-primary font-headline">Archive Sources</h1>
+          <p className="text-muted-foreground">Define and manage data governance sources for automated archival processes.</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90 shadow-md">
-              <Plus className="h-4 w-4 mr-2" /> New Policy
+              <Plus className="h-4 w-4 mr-2" /> New Archive Source
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] border-slate-200">
             <DialogHeader>
-              <DialogTitle className="font-headline text-xl text-slate-900">Create New Archival Policy</DialogTitle>
+              <DialogTitle className="font-headline text-xl text-slate-900">Create New Archive Source</DialogTitle>
               <DialogDescription>
                 Provide a name and upload your Excel definition file to get started.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="name" className="text-sm font-bold text-slate-700">Archival Policy Name</Label>
+                <Label htmlFor="name" className="text-sm font-bold text-slate-700">Source Name</Label>
                 <Input
                   id="name"
                   placeholder="e.g. Q4 Financial Cleanup"
@@ -148,10 +148,10 @@ export default function ArchivalPoliciesPage() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-base font-bold font-headline text-slate-900">
-                      {uploaded ? "Excel Uploaded Successfully" : "Upload Archival Policy (Excel)"}
+                      {uploaded ? "Excel Uploaded Successfully" : "Upload Archive Source (Excel)"}
                     </h3>
                     <p className="text-sm text-slate-500 max-w-[300px] mx-auto leading-relaxed">
-                      {uploaded ? "policy_v2_export.xlsx (12.4 KB)" : "Drag and drop your Excel sheet here or click to browse files"}
+                      {uploaded ? "source_v2_export.xlsx (12.4 KB)" : "Drag and drop your Excel sheet here or click to browse files"}
                     </p>
                   </div>
                   {!uploaded ? (
@@ -188,17 +188,17 @@ export default function ArchivalPoliciesPage() {
                 onClick={handleSavePolicy} 
                 className="bg-primary hover:bg-primary/90 font-bold px-10 shadow-lg shadow-primary/20"
               >
-                Save Policy
+                Save Source
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Existing Policies */}
+      {/* Existing Sources */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold font-headline text-slate-900">Active Policies</h2>
+          <h2 className="text-xl font-bold font-headline text-slate-900">Active Sources</h2>
           <Badge variant="outline" className="font-bold bg-white text-slate-600 border-slate-200">
             {localPolicies.length} Active
           </Badge>
@@ -222,7 +222,7 @@ export default function ArchivalPoliciesPage() {
               </CardHeader>
               <CardContent className="flex-1 mt-4">
                 <div className="space-y-3">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Governed Tables</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Involved Tables</p>
                   <div className="flex flex-wrap gap-1.5">
                     {rs.tables.map(table => (
                       <Badge key={table} variant="secondary" className="text-[10px] py-0.5 px-2.5 font-bold bg-slate-100 text-slate-600 border-0">
