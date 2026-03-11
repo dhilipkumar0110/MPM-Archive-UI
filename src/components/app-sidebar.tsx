@@ -4,7 +4,6 @@
 import * as React from "react";
 import { 
   LayoutDashboard, 
-  Database, 
   FileSpreadsheet, 
   Activity,
   CalendarDays,
@@ -32,11 +31,6 @@ const items = [
     title: "Dashboard",
     url: "/",
     icon: LayoutDashboard,
-  },
-  {
-    title: "Data Sources",
-    url: "/sources",
-    icon: Database,
   },
   {
     title: "Archive Sources",
