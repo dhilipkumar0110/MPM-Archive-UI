@@ -1,306 +1,292 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { 
-  CheckCircle2, 
-  Clock, 
-  AlertTriangle, 
-  Search, 
-  Filter, 
-  RotateCw, 
-  Calendar,
-  AlertCircle,
+  Database, 
+  ShieldCheck, 
+  TrendingDown, 
+  AlertTriangle,
+  ArrowUpRight,
+  Archive,
   Zap,
-  ShieldCheck
+  Activity,
+  Calendar
 } from "lucide-react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { 
+  Area, 
+  AreaChart, 
+  CartesianGrid, 
+  XAxis, 
+  YAxis,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Label as RechartsLabel
+} from "recharts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { METADATA_SUMMARY, ARCHIVAL_TASKS } from "@/lib/mock-data";
-import { useRouter } from "next/navigation";
+
+const ARCHIVE_TREND_DATA = [
+  { month: "Jan", volume: 450 },
+  { month: "Feb", volume: 520 },
+  { month: "Mar", volume: 480 },
+  { month: "Apr", volume: 610 },
+  { month: "May", volume: 750 },
+  { month: "Jun", volume: 820 },
+];
+
+const HEALTH_DISTRIBUTION = [
+  { name: "Healthy", value: 82, color: "hsl(var(--primary))" },
+  { name: "Warning", value: 12, color: "hsl(var(--chart-4))" },
+  { name: "Critical", value: 6, color: "hsl(var(--destructive))" },
+];
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const getSummaryIcon = (iconName: string) => {
-    switch (iconName) {
-      case "check-circle": return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
-      case "clock": return <Clock className="h-5 w-5 text-muted-foreground" />;
-      case "alert-triangle": return <AlertTriangle className="h-5 w-5 text-red-500" />;
-      default: return null;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "InProgress": return <Badge variant="secondary" className="bg-blue-50 text-blue-600 font-bold px-3 py-1">In Progress</Badge>;
-      case "Archived": return <Badge variant="secondary" className="bg-orange-50 text-orange-600 font-bold px-3 py-1">Archived</Badge>;
-      case "Completed": return <Badge variant="secondary" className="bg-green-50 text-green-600 font-bold px-3 py-1">Completed</Badge>;
-      default: return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
-
-  const handleRowDoubleClick = (taskId: string) => {
-    router.push(`/tasks/${taskId}`);
-  };
-
-  const filteredTasks = useMemo(() => {
-    return ARCHIVAL_TASKS.filter((task) => {
-      const matchesSearch = 
-        task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.dataSource.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = 
-        statusFilter === "all" || 
-        task.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
-  }, [searchTerm, statusFilter]);
-
-  const handleRefresh = () => {
-    setSearchTerm("");
-    setStatusFilter("all");
-  };
+  const healthScore = 88;
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
+    <div className="space-y-8 max-w-[1400px] mx-auto pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-headline">Dashboard</h1>
-          <p className="text-slate-500 mt-1">Monitor and manage your data archival orchestration and rulesets.</p>
+          <h1 className="text-3xl font-black tracking-tight text-slate-900 font-headline uppercase italic">Project Overview</h1>
+          <p className="text-slate-500 mt-1 font-medium">Enterprise Data Archival & Database Lifecycle Management.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center border rounded-md bg-white px-3 py-2 shadow-sm">
-            <Calendar className="h-4 w-4 text-slate-400 mr-2" />
-            <Select defaultValue="7days">
-              <SelectTrigger className="border-0 p-0 h-auto focus:ring-0 w-[120px] shadow-none font-medium">
-                <SelectValue placeholder="Last 7 Days" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7days">Last 7 Days</SelectItem>
-                <SelectItem value="30days">Last 30 Days</SelectItem>
-                <SelectItem value="90days">Last 90 Days</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button variant="outline" className="shadow-sm font-medium" onClick={handleRefresh}>
-            <RotateCw className="h-4 w-4 mr-2" /> Refresh
-          </Button>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {METADATA_SUMMARY.map((item) => (
-          <Card key={item.id} className="shadow-sm border-slate-200 relative overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="space-y-1">
-                <CardTitle className="text-sm font-medium text-slate-500">{item.label}</CardTitle>
-                <div className="text-3xl font-bold font-headline text-slate-900">{item.value}</div>
-              </div>
-              <div className={`p-2 rounded-md ${item.icon === 'alert-triangle' ? 'bg-red-50' : 'bg-slate-50'}`}>
-                {getSummaryIcon(item.icon)}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-400 mb-4">{item.description}</p>
-              {item.footer && (
-                <div className="flex items-center gap-4 border-t pt-4">
-                  <div className="flex items-center text-sm font-medium text-slate-600">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-slate-400 mr-1.5" />
-                    {item.footer.success} successful
-                  </div>
-                  <div className="flex items-center text-sm font-medium text-red-500">
-                    <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
-                    {item.footer.failed} failed
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Active Tasks Section Header */}
-      <div className="flex items-center justify-between mt-8">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-slate-900 font-headline">Active Tasks</h2>
-          <div className="flex gap-2">
-            <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-0 font-bold px-3">
-              {ARCHIVAL_TASKS.filter(t => t.status === 'InProgress').length} Running Now
-            </Badge>
-            <Badge className="bg-red-50 text-red-500 hover:bg-red-100 border-0 font-bold px-3">
-              {ARCHIVAL_TASKS.reduce((acc, t) => acc + (t.issues || 0), 0)} Issues
-            </Badge>
-          </div>
+          <Button variant="outline" className="font-bold border-slate-200">
+            <Calendar className="h-4 w-4 mr-2" /> Last 30 Days
+          </Button>
+          <Button className="bg-primary font-bold shadow-lg shadow-primary/20">
+            Generate Report
+          </Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 shadow-sm">
-        <div className="relative flex-1 min-w-[300px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Filter by task name or data source..." 
-            className="pl-10 border-slate-200 bg-slate-50/50 focus:bg-white transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] border-slate-200 bg-white">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="InProgress">In Progress</SelectItem>
-            <SelectItem value="Completed">Completed</SelectItem>
-            <SelectItem value="Archived">Archived</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button variant="outline" size="icon" className="border-slate-200 bg-white">
-          <Filter className="h-4 w-4 text-slate-600" />
-        </Button>
+      {/* Top Level KPIs */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="shadow-sm border-slate-200 overflow-hidden relative group">
+          <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <Database className="h-3.5 w-3.5" /> Storage Reclaimed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black text-slate-900 font-headline">4.2 TB</div>
+            <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 w-fit px-2 py-0.5 rounded-full">
+              <TrendingDown className="h-3 w-3" /> 12% Reduction this month
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-slate-200 overflow-hidden relative group">
+          <div className="absolute top-0 left-0 w-1 h-full bg-blue-400" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <ShieldCheck className="h-3.5 w-3.5" /> Archival Success
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black text-slate-900 font-headline">99.2%</div>
+            <div className="mt-2 text-[10px] text-slate-500 font-bold uppercase tracking-tight">
+              Across 1,482 total executions
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-slate-200 overflow-hidden relative group">
+          <div className="absolute top-0 left-0 w-1 h-full bg-orange-400" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <Archive className="h-3.5 w-3.5" /> Active Projects
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black text-slate-900 font-headline">12</div>
+            <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
+              3 Completing this week
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-slate-200 overflow-hidden relative group bg-slate-900 text-white">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <Zap className="h-3.5 w-3.5" /> System Health
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black text-white font-headline">Optimal</div>
+            <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-blue-400 uppercase">
+              No critical infrastructure alerts
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Main Task Table */}
-      <Card className="shadow-sm border-slate-200">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-slate-50/50">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-slate-600 py-4 px-6">Task Name</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4">Data Source</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4">Schedule</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4">Last Run Period</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4">Duration</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4">Status</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4">Issues</TableHead>
-                <TableHead className="font-semibold text-slate-600 py-4 pr-6">Progress</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTasks.length > 0 ? (
-                filteredTasks.map((task) => (
-                  <TableRow 
-                    key={task.id} 
-                    className="hover:bg-slate-50/30 group cursor-pointer"
-                    onDoubleClick={() => handleRowDoubleClick(task.id)}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Database Health Score - Advanced Visual */}
+        <Card className="shadow-sm border-slate-200 flex flex-col">
+          <CardHeader className="pb-0">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" /> Database Health Score
+            </CardTitle>
+            <CardDescription className="text-xs">Aggregate index, query, and deadlock analysis.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col items-center justify-center py-6">
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={HEALTH_DISTRIBUTION}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
                   >
-                    <TableCell className="px-6 py-5">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-800">{task.name}</span>
-                        <span className="text-xs text-slate-400 font-medium uppercase mt-1">{task.id}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-slate-500 font-mono text-xs">{task.dataSource}</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-slate-600 text-xs">
-                        <Zap className="h-3 w-3 mr-1.5 text-slate-400" />
-                        {task.schedule}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col text-xs text-slate-600">
-                        <span>{task.lastRunStart}</span>
-                        <span className={`italic ${task.lastRunEnd === 'Running...' ? 'text-blue-500' : 'text-slate-400'}`}>
-                          {task.lastRunEnd}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-slate-600 font-medium text-sm">{task.duration}</span>
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(task.status)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        {task.issues > 0 ? (
-                          <div className="flex items-center gap-1">
-                            <AlertTriangle className="h-4 w-4 text-red-500" />
-                            <span className="text-xs font-bold text-slate-700">{task.issues}</span>
-                          </div>
-                        ) : (
-                          <span className="text-slate-300">—</span>
-                        )}
-                        {(task as any).warnings > 0 && (
-                          <div className="flex items-center gap-1">
-                            <AlertCircle className="h-4 w-4 text-slate-400" />
-                            <span className="text-xs font-bold text-slate-700">{(task as any).warnings}</span>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="pr-6 min-w-[160px]">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                          <span className="text-slate-800">{task.progress}%</span>
-                          <span className="text-slate-400 flex items-center">
-                            {task.progress === 100 && <ShieldCheck className="h-3 w-3 mr-1 text-blue-500" />}
-                            {task.progressLabel}
-                          </span>
-                        </div>
-                        <Progress 
-                          value={task.progress} 
-                          className={`h-2 ${task.progress === 100 ? 'bg-slate-100 [&>div]:bg-blue-600' : 'bg-slate-100 [&>div]:bg-blue-400'}`} 
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="py-20 text-center text-slate-400">
-                    No active tasks match your search or filter criteria.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                    {HEALTH_DISTRIBUTION.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                    ))}
+                    <RechartsLabel
+                      value={`${healthScore}%`}
+                      position="center"
+                      className="fill-slate-900 text-4xl font-black font-headline"
+                    />
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="grid grid-cols-3 gap-4 w-full mt-2">
+              {HEALTH_DISTRIBUTION.map((item) => (
+                <div key={item.name} className="flex flex-col items-center">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.name}</span>
+                  <Badge variant="secondary" className="font-bold text-[10px] bg-slate-100">{item.value}%</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Pagination Footer */}
-      <div className="flex items-center justify-between mt-4">
-        <p className="text-sm text-slate-500 italic">Showing {filteredTasks.length} of {ARCHIVAL_TASKS.length} active archival schedules</p>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="bg-white border-slate-200 font-medium text-slate-600">
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" className="bg-white border-slate-200 font-medium text-slate-600">
-            Next
-          </Button>
-        </div>
+        {/* Archival Volume Trend */}
+        <Card className="lg:col-span-2 shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <TrendingDown className="h-4 w-4 text-primary" /> Archival Volume (GB)
+              </CardTitle>
+              <CardDescription className="text-xs">Historical trend of data transitioned to secondary storage.</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" className="text-[10px] font-bold uppercase text-primary">
+              View Details <ArrowUpRight className="ml-1 h-3 w-3" />
+            </Button>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <ChartContainer config={{ volume: { label: "Volume (GB)", color: "hsl(var(--primary))" } }}>
+              <AreaChart data={ARCHIVE_TREND_DATA}>
+                <defs>
+                  <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} 
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area 
+                  type="monotone" 
+                  dataKey="volume" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorVolume)" 
+                />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Secondary Insights Section */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="shadow-sm border-slate-200">
+          <CardHeader className="pb-2 border-b border-slate-100">
+            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Efficiency Alerts</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 space-y-4">
+            <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+              <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold text-red-900 leading-tight">High Index Fragmentation</p>
+                <p className="text-[10px] text-red-700/80">Source [XEON2] reports &gt; 30% fragmentation in payment tables.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <Archive className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold text-blue-900 leading-tight">Project Milestone Reached</p>
+                <p className="text-[10px] text-blue-700/80">Financial 2023 Archive is 100% complete and verified.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-slate-200 md:col-span-2">
+          <CardHeader className="pb-2 border-b border-slate-100 flex flex-row items-center justify-between">
+            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Archival Strategy Summary</CardTitle>
+            <Badge className="bg-slate-100 text-slate-500 border-0 font-bold text-[9px] uppercase">FY24-Q3 Focus</Badge>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Target ROI</p>
+                <p className="text-2xl font-black text-slate-900 font-headline">$14.2k</p>
+                <p className="text-[9px] text-slate-500 font-medium">Projected storage savings</p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Compliance Coverage</p>
+                <p className="text-2xl font-black text-slate-900 font-headline">100%</p>
+                <p className="text-[9px] text-slate-500 font-medium">Audit logs retained</p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Avg Latency Reduction</p>
+                <p className="text-2xl font-black text-green-600 font-headline">18%</p>
+                <p className="text-[9px] text-slate-500 font-medium">Improved query speed</p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Secondary Growth</p>
+                <p className="text-2xl font-black text-slate-900 font-headline">Low</p>
+                <p className="text-[9px] text-slate-500 font-medium">Optimized cold storage</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
