@@ -11,9 +11,10 @@ import {
   Database,
   Calendar,
   Clock,
-  X,
   PlayCircle,
-  Eye
+  Eye,
+  RotateCcw,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -42,6 +43,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { ARCHIVAL_TASKS, RULESETS } from "@/lib/mock-data";
 import { toast } from "@/hooks/use-toast";
@@ -123,6 +130,25 @@ export default function TasksPage() {
     toast({
       title: "Execution Started",
       description: "The archive task is now running in the background.",
+    });
+  };
+
+  const handleRestoreTask = (taskId: string) => {
+    setTasks(prev => prev.map(t => 
+      t.id === taskId ? { ...t, status: "New" } : t
+    ));
+    setActiveTab("New");
+    toast({
+      title: "Task Restored",
+      description: "The task has been successfully moved back to New.",
+    });
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(prev => prev.filter(t => t.id !== taskId));
+    toast({
+      title: "Task Deleted",
+      description: "The archive task has been removed.",
     });
   };
 
@@ -282,9 +308,23 @@ export default function TasksPage() {
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     {getStatusBadge(task.status)}
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {task.status === "Archived" && (
+                          <DropdownMenuItem onClick={() => handleRestoreTask(task.id)}>
+                            <RotateCcw className="h-4 w-4 mr-2" /> Restore this task
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteTask(task.id)}>
+                          <Trash2 className="h-4 w-4 mr-2" /> Delete Task
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </CardHeader>
@@ -314,12 +354,14 @@ export default function TasksPage() {
                 </div>
               </CardContent>
               <CardFooter className="pt-2 flex flex-col gap-2">
-                <Button 
-                  onClick={() => handleExecuteNow(task.id)}
-                  className="w-full bg-[#2672DB] hover:bg-[#1E5FB3] text-white font-bold h-10 shadow-sm"
-                >
-                  <PlayCircle className="h-4 w-4 mr-2" /> Execute Now
-                </Button>
+                {task.status !== "Archived" && (
+                  <Button 
+                    onClick={() => handleExecuteNow(task.id)}
+                    className="w-full bg-[#2672DB] hover:bg-[#1E5FB3] text-white font-bold h-10 shadow-sm"
+                  >
+                    <PlayCircle className="h-4 w-4 mr-2" /> Execute Now
+                  </Button>
+                )}
                 <Button variant="ghost" className="w-full text-[#2672DB] hover:text-[#1E5FB3] font-bold text-xs h-9" asChild>
                   <Link href={`/tasks/${task.id}`}>
                     <Eye className="h-3 w-3 mr-2" /> View Progress
