@@ -10,7 +10,9 @@ import {
   Archive,
   Zap,
   Activity,
-  Calendar
+  Calendar,
+  BarChart3,
+  Clock
 } from "lucide-react";
 import {
   Card,
@@ -28,6 +30,8 @@ import {
 import { 
   Area, 
   AreaChart, 
+  Bar,
+  BarChart,
   CartesianGrid, 
   XAxis, 
   YAxis,
@@ -54,6 +58,13 @@ const HEALTH_DISTRIBUTION = [
   { name: "Critical", value: 6, color: "hsl(var(--destructive))" },
 ];
 
+const SAVINGS_BY_SOURCE = [
+  { source: "Xeon2", saved: 1250 },
+  { source: "ECD", saved: 980 },
+  { source: "Finance", saved: 820 },
+  { source: "Prod-DB", saved: 650 },
+];
+
 const healthChartConfig = {
   Healthy: {
     label: "Healthy",
@@ -73,6 +84,13 @@ const trendChartConfig = {
   volume: {
     label: "Volume (GB)",
     color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig;
+
+const savingsChartConfig = {
+  saved: {
+    label: "Saved (GB)",
+    color: "hsl(var(--accent))",
   },
 } satisfies ChartConfig;
 
@@ -160,13 +178,13 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Database Health Score - Advanced Visual */}
+        {/* Database Health Score */}
         <Card className="shadow-sm border-slate-200 flex flex-col">
           <CardHeader className="pb-0">
             <CardTitle className="text-sm font-bold flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" /> Database Health Score
             </CardTitle>
-            <CardDescription className="text-xs">Aggregate index, query, and deadlock analysis.</CardDescription>
+            <CardDescription className="text-xs">Aggregate index and performance index.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col items-center justify-center py-6">
             <ChartContainer config={healthChartConfig} className="aspect-auto h-[240px] w-full">
@@ -237,7 +255,7 @@ export default function DashboardPage() {
             <ChartContainer config={trendChartConfig} className="aspect-auto h-full w-full">
               <AreaChart 
                 data={ARCHIVE_TREND_DATA}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
               >
                 <defs>
                   <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
@@ -251,6 +269,7 @@ export default function DashboardPage() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
+                  dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
@@ -274,6 +293,7 @@ export default function DashboardPage() {
 
       {/* Secondary Insights Section */}
       <div className="grid gap-6 md:grid-cols-3">
+        {/* Efficiency Alerts */}
         <Card className="shadow-sm border-slate-200">
           <CardHeader className="pb-2 border-b border-slate-100">
             <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Efficiency Alerts</CardTitle>
@@ -293,37 +313,49 @@ export default function DashboardPage() {
                 <p className="text-[10px] text-blue-700/80">Financial 2023 Archive is 100% complete and verified.</p>
               </div>
             </div>
+            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <Clock className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold text-slate-700 leading-tight">Scheduled Maintenance</p>
+                <p className="text-[10px] text-slate-500">System backup starting in 2 hours for ECD Source.</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Meaningful Replacement: Savings by Source */}
         <Card className="shadow-sm border-slate-200 md:col-span-2">
           <CardHeader className="pb-2 border-b border-slate-100 flex flex-row items-center justify-between">
-            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Archival Strategy Summary</CardTitle>
-            <Badge className="bg-slate-100 text-slate-500 border-0 font-bold text-[9px] uppercase">FY24-Q3 Focus</Badge>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Target ROI</p>
-                <p className="text-2xl font-black text-slate-900 font-headline">$14.2k</p>
-                <p className="text-[9px] text-slate-500 font-medium">Projected storage savings</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Compliance Coverage</p>
-                <p className="text-2xl font-black text-slate-900 font-headline">100%</p>
-                <p className="text-[9px] text-slate-500 font-medium">Audit logs retained</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Avg Latency Reduction</p>
-                <p className="text-2xl font-black text-green-600 font-headline">18%</p>
-                <p className="text-[9px] text-slate-500 font-medium">Improved query speed</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Secondary Growth</p>
-                <p className="text-2xl font-black text-slate-900 font-headline">Low</p>
-                <p className="text-[9px] text-slate-500 font-medium">Optimized cold storage</p>
-              </div>
+            <div>
+              <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Top Savings by Source (GB)</CardTitle>
+              <CardDescription className="text-[10px] font-medium text-slate-400">Total storage reclaimed per active archive source.</CardDescription>
             </div>
+            <Badge className="bg-primary/10 text-primary border-0 font-bold text-[9px] uppercase">Space Optimized</Badge>
+          </CardHeader>
+          <CardContent className="pt-6 h-[250px]">
+            <ChartContainer config={savingsChartConfig} className="h-full w-full">
+              <BarChart data={SAVINGS_BY_SOURCE} margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="source" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} 
+                />
+                <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                <Bar 
+                  dataKey="saved" 
+                  fill="hsl(var(--primary))" 
+                  radius={[4, 4, 0, 0]} 
+                  barSize={40}
+                />
+              </BarChart>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
