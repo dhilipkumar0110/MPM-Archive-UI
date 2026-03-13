@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   ArrowLeft, 
   Plus, 
@@ -57,6 +57,25 @@ export default function TableRuleBuilderPage() {
   ]);
   const [generatedSql, setGeneratedSql] = useState("WHERE created_at < '2023-01-01'");
 
+  // Effect to sync the SQL preview whenever conditions change
+  useEffect(() => {
+    if (conditions.length === 0) {
+      setGeneratedSql("");
+      return;
+    }
+
+    const sql = conditions.reduce((acc, cond, index) => {
+      // Helper to determine if value needs quotes
+      const needsQuotes = isNaN(Number(cond.value)) || cond.value.trim() === "";
+      const formattedValue = needsQuotes ? `'${cond.value}'` : cond.value;
+      
+      const prefix = index === 0 ? "WHERE " : ` ${cond.join} `;
+      return acc + prefix + `${cond.column} ${cond.operator} ${formattedValue}`;
+    }, "");
+
+    setGeneratedSql(sql);
+  }, [conditions]);
+
   const addCondition = () => {
     setConditions([
       ...conditions,
@@ -86,10 +105,10 @@ export default function TableRuleBuilderPage() {
     router.push(`/rulesets/${id}`);
   };
 
-  if (!policy) return <div className="p-8 text-center">Loading archival policy...</div>;
+  if (!policy) return <div className="p-8 text-center">Loading archive source...</div>;
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-5xl mx-auto pb-10">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="icon" className="rounded-full">
@@ -102,7 +121,7 @@ export default function TableRuleBuilderPage() {
             <h1 className="text-2xl font-bold tracking-tight text-primary font-headline">Table Rule Configuration</h1>
             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">{tableName}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival in policy: {policy.name}.</p>
+          <p className="text-sm text-muted-foreground">Define precise filter conditions for source data archival in source: {policy.name}.</p>
         </div>
       </div>
 
@@ -123,9 +142,18 @@ export default function TableRuleBuilderPage() {
                 <div key={cond.id} className="flex flex-wrap items-center gap-3 p-4 bg-muted/20 rounded-xl border border-border/40 relative group">
                   {index > 0 && (
                     <div className="absolute -top-3 left-6 z-10">
-                      <span className="px-3 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold uppercase rounded-full shadow-sm">
-                        {cond.join}
-                      </span>
+                      <Select 
+                        value={cond.join} 
+                        onValueChange={(val: "AND" | "OR") => updateCondition(cond.id, { join: val })}
+                      >
+                        <SelectTrigger className="h-6 w-20 px-2 bg-primary text-primary-foreground text-[10px] font-bold uppercase rounded-full shadow-sm border-0 focus:ring-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AND">AND</SelectItem>
+                          <SelectItem value="OR">OR</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   )}
 
@@ -198,7 +226,7 @@ export default function TableRuleBuilderPage() {
             <CardContent>
               <div className="bg-black/90 text-green-400 p-4 rounded-lg font-mono text-sm border-l-4 border-primary">
                 <span className="text-blue-400">SELECT</span> * <span className="text-blue-400">FROM</span> {tableName}<br />
-                {generatedSql}
+                <span className="whitespace-pre-wrap">{generatedSql}</span>
               </div>
             </CardContent>
           </Card>
